@@ -38,7 +38,6 @@
             type="button"
             class="v2k-start-item"
             role="menuitem"
-            style="width:100%;border:none;background:transparent;text-align:left"
             onclick={() => launch(appId)}
           >
             <span class="glyph" aria-hidden="true">{appGlyph(appId)}</span>
@@ -47,7 +46,7 @@
         </li>
       {/each}
       <li class="v2k-start-sep" aria-hidden="true"></li>
-      <li class="v2k-start-footer">Vet2000 · Retro Desktop</li>
+      <li class="v2k-start-footer">Vet2000 · not affiliated with Microsoft</li>
     </ul>
   </div>
 {/if}

@@ -1,6 +1,6 @@
 # VetTV Retro Desktop — Project brief
 
-Status: M2 complete (VFS + Files / Notepad / Image Viewer) (2026-09-26 PT)  
+Status: M3 complete (Calculator + polish + About/legal) (2026-09-26 PT)  
 Owner bot: VetTV Retro Desktop  
 Brand: VetTV / VetTV Studios / Retro TV Archive
 
@@ -29,8 +29,7 @@ Browser “web OS” shells inspired by Windows 98SE, Windows 2000, and Windows 
 - Boot → desktop for **Vet2000**
 - Window manager + taskbar/Start
 - VFS with Documents + drag-drop upload
-- Apps: Files, Notepad, Calculator (Calculator stub until M3)
-- Image Viewer for common image types
+- Apps: Files, Notepad, Calculator (working), Image Viewer, About
 - Session restore on reload
 - Deploy static site
 

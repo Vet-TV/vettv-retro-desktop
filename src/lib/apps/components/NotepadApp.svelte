@@ -147,7 +147,7 @@
     disabled={loading}
   ></textarea>
 
-  <div class="notepad-status">{status}{dirty ? ' (modified)' : ''}</div>
+  <div class="notepad-status v2k-status">{status}{dirty ? ' (modified)' : ''}</div>
 </div>
 
 <style>

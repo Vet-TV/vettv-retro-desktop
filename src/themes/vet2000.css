@@ -103,6 +103,42 @@
   outline-offset: -4px;
 }
 
+.v2k-btn:disabled {
+  color: #808080;
+  cursor: default;
+}
+
+.v2k-input {
+  font-family: var(--v2k-font);
+  font-size: var(--v2k-font-size);
+  padding: 2px 4px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-dark) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-dark);
+  background: #fff;
+  color: #000;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.v2k-input:focus {
+  outline: 1px dotted #000;
+  outline-offset: -3px;
+}
+
+.v2k-status {
+  flex-shrink: 0;
+  padding: 2px 6px;
+  background: var(--v2k-face);
+  border-top: 1px solid var(--v2k-face-light);
+  font-size: 10px;
+  color: #333;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* --- Desktop --- */
 .v2k-desktop {
   position: fixed;
@@ -140,8 +176,10 @@
   cursor: default;
 }
 
-.v2k-desktop-icon:hover {
+.v2k-desktop-icon:hover,
+.v2k-desktop-icon:focus-visible {
   background: rgba(10, 36, 106, 0.35);
+  outline: none;
 }
 
 .v2k-desktop-icon .glyph {
@@ -181,7 +219,9 @@
 }
 
 .v2k-window.maximized {
-  border-width: 0;
+  border-width: 1px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
   border-radius: 0;
 }
 
@@ -269,8 +309,14 @@
     var(--v2k-face-darker);
 }
 
+.v2k-title-btn.close:hover {
+  background: #c44;
+  color: #fff;
+  border-color: #e88 #600 #600 #e88;
+}
+
 .v2k-title-btn.close:active {
-  /* keep same */
+  border-color: #600 #e88 #e88 #600;
 }
 
 .v2k-window-body {
@@ -543,11 +589,16 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  width: 100%;
   padding: 6px 12px 6px 8px;
   font-family: var(--v2k-font);
   font-size: 11px;
   color: #000;
   cursor: default;
+  border: none;
+  background: transparent;
+  text-align: left;
+  box-sizing: border-box;
 }
 
 .v2k-start-item:hover,

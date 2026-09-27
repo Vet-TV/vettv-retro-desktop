@@ -4,8 +4,8 @@ export const APP_REGISTRY: Record<AppId, AppDefinition> = {
   about: {
     id: 'about',
     title: 'About VetTV Retro Desktop',
-    defaultW: 400,
-    defaultH: 280,
+    defaultW: 440,
+    defaultH: 420,
   },
   notepad: {
     id: 'notepad',
@@ -16,8 +16,8 @@ export const APP_REGISTRY: Record<AppId, AppDefinition> = {
   calculator: {
     id: 'calculator',
     title: 'Calculator',
-    defaultW: 280,
-    defaultH: 340,
+    defaultW: 260,
+    defaultH: 320,
   },
   files: {
     id: 'files',

@@ -3,7 +3,7 @@
 Browser-based classic desktop shell for **VetTV / Retro TV Archive**.  
 MVP launch skin: **Vet2000** (Win2000-inspired gray corporate chrome — original VetTV art only).
 
-Not real Windows. Not affiliated with Microsoft. Sibling product **VetTV Vintage PC** owns native BYO-ISO emulation — this repo stays a web shell.
+Not real Windows. **Not affiliated with Microsoft.** Sibling product **VetTV Vintage PC** owns native BYO-ISO emulation — this repo stays a web shell / nostalgia toy.
 
 See `PROJECT_BRIEF.md` for product scope and eras (Vet2000 → Vet98 / VetXP later).
 
@@ -30,7 +30,7 @@ npm run check    # svelte-check + tsc
 
 - [x] Vet2000 desktop (CSS gradient / solid; no copyrighted wallpapers)
 - [x] Taskbar with Start button, clock, open-window buttons
-- [x] Start menu launches stub apps: About, Notepad, Calculator
+- [x] Start menu launches apps: About, Notepad, Calculator, Files
 - [x] Window manager: open / focus / drag / resize / minimize / maximize / close / z-order
 - [x] Modular theme CSS: `src/themes/vet2000.css`
 - [x] Session restore via `localStorage` (window geometry + minimized/maximized)
@@ -48,16 +48,24 @@ npm run check    # svelte-check + tsc
 - [x] **Notepad**: open/save/Save As text files in VFS (`C:/Documents`)
 - [x] **Files**: browse drives/folders; open `.txt` in Notepad; open images in **Image Viewer**
 - [x] Drag-drop `.png` → stored → opens in Image Viewer
-- [x] Calculator remains a stub (M3)
 - [x] `npm run build` and `npm run check` succeed
 
-**Out of scope for M2 (deferred):** real Calculator, App Market, Vet98 / VetXP themes, custom domain, Vintage Lab / v86.
+## Milestone 3 — done criteria (Calculator + polish + legal)
 
-## What’s next (M3)
+- [x] **Calculator**: real basic ops (+ − × ÷), clear / clear-entry / backspace / ± / decimal, keyboard support when window is active
+- [x] Calculator opens from Start menu and desktop icon; session restore reopens Calculator windows
+- [x] Vet2000 chrome polish: shared inputs/buttons/status, title-bar close hover, Start menu / taskbar consistency, Files ASCII glyphs (no emoji), “Drives” root label
+- [x] **About**: clear language — browser nostalgia toy / fake OS shell; **not affiliated with Microsoft**; no Windows trademarks as official; original VetTV chrome; no `.exe` execution
+- [x] README + PROJECT_BRIEF mark M3 done
+- [x] `npm run build` and `npm run check` succeed
 
-- Real Calculator
-- Polish Files / Notepad UX
-- Optional media playback stubs
+**Out of scope for M3 (deferred):** App Market, Vet98 / VetXP themes, custom domain, Vintage Lab / v86, media playback.
+
+## What’s next (V1 / later)
+
+- Vet98 + VetXP theme packs
+- App Market (iframe web apps + postMessage API)
+- Optional media playback stubs / 1–2 web remake games
 
 ## Deploy — GitHub Pages (MVP host)
 
@@ -77,7 +85,7 @@ Use `/<repo-name>/` when the site is a **project** Pages site (`https://<user>.g
 
 1. Push this repo to GitHub (default branch `main`).
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Push to `main` (or run **Actions → Deploy to GitHub Pages → Run workflow**). Actions-from-main is the primary path; an interim `gh-pages` branch deploy may still exist until the first Actions run succeeds.
+3. Push to `main` (or run **Actions → Deploy to GitHub Pages → Run workflow**).
 4. Workflow: `.github/workflows/deploy-pages.yml` builds `dist` and deploys via `actions/upload-pages-artifact` + `actions/deploy-pages`.
 
 **Live MVP preview:** https://vet-tv.github.io/vettv-retro-desktop/
@@ -91,14 +99,13 @@ Use `/<repo-name>/` when the site is a **project** Pages site (`https://<user>.g
 
 Custom VetTV domain: configure later (post-MVP); leave Pages default hostname until then.
 
-**No public deploy URL is configured in this workspace** (no GitHub remote / Pages site wired here).
-
 ## Legal / brand
 
 - Original VetTV / Retro TV Archive naming and chrome only
 - No Microsoft logos, Bliss wallpaper, official Luna assets, or Windows trademarks as affiliation
 - Window titles / Start menu say **VetTV Retro Desktop** or **Vet2000** — never “Windows”
 - Do not ship or promise `.exe` / Win32 compatibility
+- About dialog states clearly: nostalgia toy / fake OS shell; not affiliated with Microsoft
 
 ## Layout (key paths)
 
@@ -123,14 +130,13 @@ src/
 PROJECT_BRIEF.md
 ```
 
-## Manual verify (M2)
+## Manual verify (M3)
 
 1. `npm run dev` → open desktop.
-2. Start → Files → see `C:/`, `D:/`; open `C:/Documents` → `Welcome.txt`.
-3. Double-click `Welcome.txt` → Notepad; edit; **Save**; refresh page → Files still lists the file.
-4. Drag a `.png` onto the desktop → lands in `C:/Media/Pictures` and opens in Image Viewer.
-5. In Files, create a dummy `.exe` (or upload one) and open it → unsupported message (no execution).
-6. Refresh → VFS contents remain; window layout restores separately.
+2. Double-click **Calculator** (or Start → Calculator) → try `7 + 3 =` → `10`; divide by zero → Error; Esc clears.
+3. Refresh → Calculator window restores if left open.
+4. Start → About → read legal disclaimer (not affiliated with Microsoft).
+5. Files / Notepad still open/save; `.exe` still shows unsupported alert only.
 
 ## Package
 

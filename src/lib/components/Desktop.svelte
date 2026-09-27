@@ -36,6 +36,10 @@
     windowManager.openApp('notepad')
   }
 
+  function openCalculator() {
+    windowManager.openApp('calculator')
+  }
+
   function openAbout() {
     windowManager.openApp('about')
   }
@@ -125,6 +129,16 @@
     >
       <span class="glyph" aria-hidden="true">N</span>
       <span class="label">Notepad</span>
+    </button>
+    <button
+      type="button"
+      class="v2k-desktop-icon"
+      style="border:none;background:transparent"
+      ondblclick={openCalculator}
+      title="Calculator"
+    >
+      <span class="glyph" aria-hidden="true">#</span>
+      <span class="label">Calculator</span>
     </button>
     <button
       type="button"

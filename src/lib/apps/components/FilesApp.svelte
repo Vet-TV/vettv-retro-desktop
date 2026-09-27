@@ -52,7 +52,7 @@
       error = ''
       if (cwd === '' || cwd === '/') {
         entries = await listDrives()
-        status = 'My Computer'
+        status = 'Drives'
       } else {
         entries = await listDir(cwd)
         status = `${entries.length} object(s)`
@@ -106,13 +106,13 @@
   }
 
   function glyph(entry: VfsMeta): string {
-    if (entry.kind === 'drive') return '💾'
-    if (entry.kind === 'dir') return '📁'
+    if (entry.kind === 'drive') return 'D'
+    if (entry.kind === 'dir') return 'F'
     const n = entry.name.toLowerCase()
-    if (n.endsWith('.txt')) return '📄'
-    if (/\.(png|jpe?g|gif|webp|bmp)$/i.test(n)) return '🖼️'
-    if (n.endsWith('.exe')) return '⚠️'
-    return '📄'
+    if (n.endsWith('.txt')) return 'T'
+    if (/\.(png|jpe?g|gif|webp|bmp)$/i.test(n)) return 'I'
+    if (n.endsWith('.exe')) return '!'
+    return '·'
   }
 
   async function doNewFolder() {
@@ -212,7 +212,7 @@
 <div class="files" ondragover={onDragOver} ondrop={onDrop}>
   <div class="files-toolbar" role="toolbar">
     <button type="button" class="v2k-btn" onclick={goUp} title="Up one level">Up</button>
-    <button type="button" class="v2k-btn" onclick={goComputer} title="My Computer">Computer</button>
+    <button type="button" class="v2k-btn" onclick={goComputer} title="Drives">Drives</button>
     <button
       type="button"
       class="v2k-btn"
@@ -241,7 +241,7 @@
     <span class="addr-label">Address</span>
     <input
       class="v2k-input addr"
-      value={cwd === '' ? 'My Computer' : cwd}
+      value={cwd === '' ? 'Drives' : cwd}
       readonly
       aria-label="Current folder"
     />
@@ -303,7 +303,7 @@
     {/each}
   </div>
 
-  <div class="files-status">{status}</div>
+  <div class="files-status v2k-status">{status}</div>
 </div>
 
 <style>
@@ -388,9 +388,23 @@
     color: #fff;
   }
   .files-glyph {
-    width: 20px;
+    width: 18px;
+    height: 16px;
     text-align: center;
     flex-shrink: 0;
+    background: var(--v2k-face, #d4d0c8);
+    border: 1px solid var(--v2k-face-darker, #404040);
+    font-size: 9px;
+    font-weight: bold;
+    color: #0a246a;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  .files-row.selected .files-glyph {
+    background: #fff;
+    color: #0a246a;
   }
   .files-name {
     flex: 1;
