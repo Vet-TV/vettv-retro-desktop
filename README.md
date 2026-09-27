@@ -80,6 +80,8 @@ Use `/<repo-name>/` when the site is a **project** Pages site (`https://<user>.g
 3. Push to `main` (or run **Actions → Deploy to GitHub Pages → Run workflow**).
 4. Workflow: `.github/workflows/deploy-pages.yml` builds `dist` and deploys via `actions/upload-pages-artifact` + `actions/deploy-pages`.
 
+**Live MVP preview:** https://vet-tv.github.io/vettv-retro-desktop/
+
 ### Expected URL shape
 
 | Site type | URL |

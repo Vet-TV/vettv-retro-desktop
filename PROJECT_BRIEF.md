@@ -49,3 +49,8 @@ Browser “web OS” shells inspired by Windows 98SE, Windows 2000, and Windows 
 
 ## Host (locked)
 - **GitHub Pages** for MVP; custom VetTV domain can alias later
+
+## Live preview
+- https://vet-tv.github.io/vettv-retro-desktop/
+- Repo: https://github.com/Vet-TV/vettv-retro-desktop
+- Deploy path: `gh-pages` branch (Actions workflow needs `workflow` OAuth scope to push later)
