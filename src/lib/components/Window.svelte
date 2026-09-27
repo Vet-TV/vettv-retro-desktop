@@ -2,6 +2,7 @@
   import type { WindowState } from '../types'
   import { windowManager } from '../stores/windowManager'
   import { appGlyph } from '../apps/registry'
+  import { appIcon } from '../apps/icons'
   import AboutApp from '../apps/components/AboutApp.svelte'
   import NotepadApp from '../apps/components/NotepadApp.svelte'
   import CalculatorApp from '../apps/components/CalculatorApp.svelte'
@@ -131,7 +132,13 @@
       onpointerdown={onTitlePointerDown}
       ondblclick={onTitleDblClick}
     >
-      <span class="v2k-titlebar-icon" aria-hidden="true">{appGlyph(win.appId)}</span>
+      <span class="v2k-titlebar-icon" aria-hidden="true">
+        {#if appIcon(win.appId)}
+          <img src={appIcon(win.appId)} alt="" width="16" height="16" draggable="false" />
+        {:else}
+          {appGlyph(win.appId)}
+        {/if}
+      </span>
       <span class="v2k-titlebar-text">{win.title}</span>
       <div class="v2k-titlebar-controls">
         <button

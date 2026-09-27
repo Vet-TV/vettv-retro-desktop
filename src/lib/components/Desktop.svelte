@@ -3,6 +3,8 @@
   import { windowManager } from '../stores/windowManager'
   import type { WindowState } from '../types'
   import { initVfs, openVfsPath, uploadBrowserFiles } from '../vfs'
+  import { appIcon, V2K_WALLPAPER } from '../apps/icons'
+  import { appGlyph } from '../apps/registry'
   import Window from './Window.svelte'
   import Taskbar from './Taskbar.svelte'
 
@@ -96,6 +98,23 @@
       dropStatus = err instanceof Error ? err.message : 'Upload failed'
     }
   }
+
+  const desktopApps = [
+    { id: 'files' as const, label: 'Files', title: 'Files', open: openFiles },
+    { id: 'notepad' as const, label: 'Notepad', title: 'Notepad', open: openNotepad },
+    {
+      id: 'calculator' as const,
+      label: 'Calculator',
+      title: 'Calculator',
+      open: openCalculator,
+    },
+    {
+      id: 'about' as const,
+      label: 'About VetTV',
+      title: 'About VetTV Retro Desktop',
+      open: openAbout,
+    },
+  ]
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -105,51 +124,30 @@
   data-theme="vet2000"
   role="application"
   aria-label="VetTV Retro Desktop"
+  style={`--v2k-wallpaper-url: url('${V2K_WALLPAPER}')`}
   ondragover={onDragOver}
   ondragleave={onDragLeave}
   ondrop={(e) => void onDrop(e)}
 >
   <div class="v2k-desktop-icons">
-    <button
-      type="button"
-      class="v2k-desktop-icon"
-      style="border:none;background:transparent"
-      ondblclick={openFiles}
-      title="Files"
-    >
-      <span class="glyph" aria-hidden="true">F</span>
-      <span class="label">Files</span>
-    </button>
-    <button
-      type="button"
-      class="v2k-desktop-icon"
-      style="border:none;background:transparent"
-      ondblclick={openNotepad}
-      title="Notepad"
-    >
-      <span class="glyph" aria-hidden="true">N</span>
-      <span class="label">Notepad</span>
-    </button>
-    <button
-      type="button"
-      class="v2k-desktop-icon"
-      style="border:none;background:transparent"
-      ondblclick={openCalculator}
-      title="Calculator"
-    >
-      <span class="glyph" aria-hidden="true">#</span>
-      <span class="label">Calculator</span>
-    </button>
-    <button
-      type="button"
-      class="v2k-desktop-icon"
-      style="border:none;background:transparent"
-      ondblclick={openAbout}
-      title="About VetTV Retro Desktop"
-    >
-      <span class="glyph" aria-hidden="true">i</span>
-      <span class="label">About VetTV</span>
-    </button>
+    {#each desktopApps as app}
+      <button
+        type="button"
+        class="v2k-desktop-icon"
+        style="border:none;background:transparent"
+        ondblclick={app.open}
+        title={app.title}
+      >
+        <span class="glyph" aria-hidden="true">
+          {#if appIcon(app.id)}
+            <img src={appIcon(app.id)} alt="" width="32" height="32" draggable="false" />
+          {:else}
+            {appGlyph(app.id)}
+          {/if}
+        </span>
+        <span class="label">{app.label}</span>
+      </button>
+    {/each}
   </div>
 
   {#if dropActive}

@@ -2,6 +2,7 @@
  * Vet2000 theme — original VetTV chrome inspired by classic corporate gray desktops.
  * Modular so Vet98 / VetXP skins can be added later without rewriting components.
  * No Microsoft trademarks, logos, or copyrighted wallpapers.
+ * Art batch 1: CRT wallpaper + SVG chrome icons (public/themes/vet2000).
  */
 
 :root,
@@ -143,11 +144,15 @@
 .v2k-desktop {
   position: fixed;
   inset: 0;
-  background: linear-gradient(
-    165deg,
-    var(--v2k-desktop-top) 0%,
-    var(--v2k-desktop-bot) 100%
+  /* CRT/broadcast wallpaper (art batch 1); gradient fallback under image */
+  background-color: var(--v2k-desktop-bot);
+  background-image: var(
+    --v2k-wallpaper-url,
+    linear-gradient(165deg, var(--v2k-desktop-top) 0%, var(--v2k-desktop-bot) 100%)
   );
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   font-family: var(--v2k-font);
   font-size: var(--v2k-font-size);
   overflow: hidden;
@@ -185,14 +190,23 @@
 .v2k-desktop-icon .glyph {
   width: 32px;
   height: 32px;
-  background: var(--v2k-face);
-  border: 1px solid var(--v2k-face-darker);
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   color: var(--v2k-title-active-start);
   font-size: 14px;
+  overflow: hidden;
+  image-rendering: pixelated;
+}
+
+.v2k-desktop-icon .glyph img {
+  width: 32px;
+  height: 32px;
+  display: block;
+  pointer-events: none;
 }
 
 .v2k-desktop-icon .label {
@@ -258,14 +272,22 @@
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  background: var(--v2k-face);
-  border: 1px solid var(--v2k-face-darker);
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 9px;
   font-weight: bold;
   color: var(--v2k-title-active-start);
+  overflow: hidden;
+}
+
+.v2k-titlebar-icon img {
+  width: 16px;
+  height: 16px;
+  display: block;
+  pointer-events: none;
 }
 
 .v2k-titlebar-text {
@@ -461,14 +483,23 @@
 .v2k-start-logo {
   width: 16px;
   height: 16px;
-  background: linear-gradient(135deg, #0a246a, #3a6ea5);
-  border: 1px solid #404040;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
   font-size: 9px;
   font-weight: bold;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.v2k-start-logo img {
+  width: 16px;
+  height: 16px;
+  display: block;
+  pointer-events: none;
 }
 
 .v2k-task-buttons {
@@ -514,14 +545,22 @@
   width: 14px;
   height: 14px;
   flex-shrink: 0;
-  background: #fff;
-  border: 1px solid #808080;
+  background: transparent;
+  border: none;
   font-size: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   color: #0a246a;
+  overflow: hidden;
+}
+
+.v2k-task-btn .glyph img {
+  width: 14px;
+  height: 14px;
+  display: block;
+  pointer-events: none;
 }
 
 .v2k-tray {
@@ -611,8 +650,8 @@
 .v2k-start-item .glyph {
   width: 24px;
   height: 24px;
-  background: #fff;
-  border: 1px solid #808080;
+  background: transparent;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -620,6 +659,14 @@
   font-size: 11px;
   color: #0a246a;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.v2k-start-item .glyph img {
+  width: 24px;
+  height: 24px;
+  display: block;
+  pointer-events: none;
 }
 
 .v2k-start-sep {

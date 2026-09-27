@@ -28,7 +28,7 @@ npm run check    # svelte-check + tsc
 
 ## Milestone 1 — done criteria
 
-- [x] Vet2000 desktop (CSS gradient / solid; no copyrighted wallpapers)
+- [x] Vet2000 desktop (CRT/broadcast wallpaper from art batch 1; no copyrighted wallpapers)
 - [x] Taskbar with Start button, clock, open-window buttons
 - [x] Start menu launches apps: About, Notepad, Calculator, Files
 - [x] Window manager: open / focus / drag / resize / minimize / maximize / close / z-order
@@ -107,9 +107,22 @@ Custom VetTV domain: configure later (post-MVP); leave Pages default hostname un
 - Do not ship or promise `.exe` / Win32 compatibility
 - About dialog states clearly: nostalgia toy / fake OS shell; not affiliated with Microsoft
 
+## Art — Vet2000 batch 1 (2026-09-26 PT)
+
+Curated chrome under `public/themes/vet2000/` (incoming packs stay in `art-incoming/`, gitignored):
+
+- **Wallpaper:** `v2k-wallpaper-crt.png` (CRT/broadcast; locked default)
+- **Start:** SVG V mark + stripe wordmark **Vet2000**
+- **Icons:** Files / Notepad / Calculator / About (SVG preferred; PNG 16/32 fallbacks)
+- **Favicon:** `public/favicon.svg` (matches theme mark)
+- No MS marks / Bliss / Start orb
+
 ## Layout (key paths)
 
 ```
+public/
+  favicon.svg
+  themes/vet2000/      # art batch 1 wallpaper + SVG/PNG chrome
 src/
   App.svelte
   main.ts
@@ -118,6 +131,7 @@ src/
   lib/
     types.ts
     apps/registry.ts
+    apps/icons.ts      # Vet2000 asset URLs
     apps/components/   # About, Notepad, Files, ImageViewer, Calculator, Alert
     stores/windowManager.ts
     vfs/               # IndexedDB VFS (paths, idb, mime, open)

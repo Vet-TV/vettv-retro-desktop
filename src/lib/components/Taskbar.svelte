@@ -3,6 +3,7 @@
   import type { WindowState } from '../types'
   import { windowManager } from '../stores/windowManager'
   import { appGlyph } from '../apps/registry'
+  import { appIcon, V2K_START_V } from '../apps/icons'
   import StartMenu from './StartMenu.svelte'
 
   interface Props {
@@ -56,7 +57,9 @@
     aria-expanded={startOpen}
     onclick={toggleStart}
   >
-    <span class="v2k-start-logo" aria-hidden="true">V</span>
+    <span class="v2k-start-logo" aria-hidden="true">
+      <img src={V2K_START_V} alt="" width="16" height="16" draggable="false" />
+    </span>
     Start
   </button>
 
@@ -69,7 +72,13 @@
         title={win.title}
         onclick={() => windowManager.taskbarClick(win.id)}
       >
-        <span class="glyph" aria-hidden="true">{appGlyph(win.appId)}</span>
+        <span class="glyph" aria-hidden="true">
+          {#if appIcon(win.appId)}
+            <img src={appIcon(win.appId)} alt="" width="14" height="14" draggable="false" />
+          {:else}
+            {appGlyph(win.appId)}
+          {/if}
+        </span>
         <span>{win.title}</span>
       </button>
     {/each}

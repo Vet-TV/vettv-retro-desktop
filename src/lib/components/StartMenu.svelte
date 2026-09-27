@@ -1,5 +1,6 @@
 <script lang="ts">
   import { APP_REGISTRY, START_MENU_APPS, appGlyph } from '../apps/registry'
+  import { appIcon, V2K_START_WORDMARK } from '../apps/icons'
   import type { AppId } from '../types'
   import { windowManager } from '../stores/windowManager'
 
@@ -29,7 +30,7 @@
     tabindex="-1"
     onkeydown={onKey}
   >
-    <div class="v2k-start-stripe" aria-hidden="true">VetTV</div>
+    <div class="v2k-start-stripe" aria-hidden="true">{V2K_START_WORDMARK}</div>
     <ul class="v2k-start-items">
       {#each START_MENU_APPS as appId}
         {@const def = APP_REGISTRY[appId]}
@@ -40,7 +41,13 @@
             role="menuitem"
             onclick={() => launch(appId)}
           >
-            <span class="glyph" aria-hidden="true">{appGlyph(appId)}</span>
+            <span class="glyph" aria-hidden="true">
+              {#if appIcon(appId)}
+                <img src={appIcon(appId)} alt="" width="24" height="24" draggable="false" />
+              {:else}
+                {appGlyph(appId)}
+              {/if}
+            </span>
             <span>{def.title}</span>
           </button>
         </li>

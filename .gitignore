@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Incoming art packs (curated copies live under public/themes)
+art-incoming/
