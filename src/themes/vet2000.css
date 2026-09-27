@@ -1,0 +1,637 @@
+/**
+ * Vet2000 theme — original VetTV chrome inspired by classic corporate gray desktops.
+ * Modular so Vet98 / VetXP skins can be added later without rewriting components.
+ * No Microsoft trademarks, logos, or copyrighted wallpapers.
+ */
+
+:root,
+[data-theme='vet2000'] {
+  /* Surface */
+  --v2k-face: #d4d0c8;
+  --v2k-face-dark: #808080;
+  --v2k-face-darker: #404040;
+  --v2k-face-light: #ffffff;
+  --v2k-face-mid: #c0c0c0;
+
+  /* Desktop */
+  --v2k-desktop-top: #3a6ea5;
+  --v2k-desktop-bot: #1e3a5f;
+
+  /* Title bar (active / inactive) — VetTV blue family, not Luna */
+  --v2k-title-active-start: #0a246a;
+  --v2k-title-active-end: #a6caf0;
+  --v2k-title-inactive-start: #808080;
+  --v2k-title-inactive-end: #c0c0c0;
+  --v2k-title-text: #ffffff;
+  --v2k-title-text-inactive: #d4d0c8;
+
+  /* Taskbar / Start */
+  --v2k-taskbar-h: 30px;
+  --v2k-start-face: #d4d0c8;
+  --v2k-start-text: #000000;
+  --v2k-menu-face: #d4d0c8;
+  --v2k-menu-highlight: #0a246a;
+  --v2k-menu-highlight-text: #ffffff;
+  --v2k-menu-stripe: #0a246a;
+
+  /* Chrome */
+  --v2k-font: 'Tahoma', 'MS Sans Serif', 'Segoe UI', sans-serif;
+  --v2k-font-size: 11px;
+  --v2k-border: 2px;
+  --v2k-window-shadow: none;
+
+  color-scheme: light;
+}
+
+/* --- Bevel helpers (classic raised / sunken) --- */
+.v2k-raised {
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  background: var(--v2k-face);
+}
+
+.v2k-raised-thin {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--v2k-face-light) var(--v2k-face-dark) var(--v2k-face-dark)
+    var(--v2k-face-light);
+  background: var(--v2k-face);
+}
+
+.v2k-sunken {
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-darker) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-darker);
+  background: var(--v2k-face);
+}
+
+.v2k-sunken-thin {
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--v2k-face-dark) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-dark);
+  background: var(--v2k-face);
+}
+
+.v2k-btn {
+  font-family: var(--v2k-font);
+  font-size: var(--v2k-font-size);
+  background: var(--v2k-face);
+  color: #000;
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  padding: 2px 10px;
+  cursor: default;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.v2k-btn:active,
+.v2k-btn.pressed {
+  border-color: var(--v2k-face-darker) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-darker);
+  padding: 3px 9px 1px 11px;
+}
+
+.v2k-btn:focus-visible {
+  outline: 1px dotted #000;
+  outline-offset: -4px;
+}
+
+/* --- Desktop --- */
+.v2k-desktop {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(
+    165deg,
+    var(--v2k-desktop-top) 0%,
+    var(--v2k-desktop-bot) 100%
+  );
+  font-family: var(--v2k-font);
+  font-size: var(--v2k-font-size);
+  overflow: hidden;
+  user-select: none;
+}
+
+.v2k-desktop-icons {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 1;
+}
+
+.v2k-desktop-icon {
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  color: #fff;
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.7);
+  cursor: default;
+}
+
+.v2k-desktop-icon:hover {
+  background: rgba(10, 36, 106, 0.35);
+}
+
+.v2k-desktop-icon .glyph {
+  width: 32px;
+  height: 32px;
+  background: var(--v2k-face);
+  border: 1px solid var(--v2k-face-darker);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: var(--v2k-title-active-start);
+  font-size: 14px;
+}
+
+.v2k-desktop-icon .label {
+  text-align: center;
+  font-size: 11px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+/* --- Window chrome --- */
+.v2k-window {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  min-width: 180px;
+  min-height: 100px;
+  background: var(--v2k-face);
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  box-sizing: border-box;
+  box-shadow: var(--v2k-window-shadow);
+}
+
+.v2k-window.maximized {
+  border-width: 0;
+  border-radius: 0;
+}
+
+.v2k-window.minimized {
+  display: none;
+}
+
+.v2k-titlebar {
+  display: flex;
+  align-items: center;
+  height: 22px;
+  padding: 2px 2px 2px 4px;
+  gap: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--v2k-title-inactive-start),
+    var(--v2k-title-inactive-end)
+  );
+  color: var(--v2k-title-text-inactive);
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.v2k-window.active .v2k-titlebar {
+  background: linear-gradient(
+    90deg,
+    var(--v2k-title-active-start),
+    var(--v2k-title-active-end)
+  );
+  color: var(--v2k-title-text);
+}
+
+.v2k-titlebar-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  background: var(--v2k-face);
+  border: 1px solid var(--v2k-face-darker);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+  color: var(--v2k-title-active-start);
+}
+
+.v2k-titlebar-text {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  font-size: 11px;
+  letter-spacing: 0.2px;
+}
+
+.v2k-titlebar-controls {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.v2k-title-btn {
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--v2k-font);
+  font-size: 10px;
+  font-weight: bold;
+  line-height: 1;
+  background: var(--v2k-face);
+  color: #000;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  cursor: default;
+}
+
+.v2k-title-btn:active {
+  border-color: var(--v2k-face-darker) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-darker);
+}
+
+.v2k-title-btn.close:active {
+  /* keep same */
+}
+
+.v2k-window-body {
+  flex: 1;
+  margin: 2px;
+  padding: 8px;
+  background: #fff;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--v2k-face-dark) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-dark);
+  overflow: auto;
+  color: #000;
+  font-family: var(--v2k-font);
+  font-size: var(--v2k-font-size);
+  cursor: auto;
+  user-select: text;
+}
+
+.v2k-window-body h2 {
+  margin: 0 0 8px;
+  font-size: 14px;
+}
+
+.v2k-window-body p {
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.v2k-window-body .muted {
+  color: #555;
+}
+
+/* Resize handles */
+.v2k-resize {
+  position: absolute;
+  z-index: 2;
+}
+
+.v2k-resize.n {
+  top: -2px;
+  left: 6px;
+  right: 6px;
+  height: 4px;
+  cursor: ns-resize;
+}
+.v2k-resize.s {
+  bottom: -2px;
+  left: 6px;
+  right: 6px;
+  height: 4px;
+  cursor: ns-resize;
+}
+.v2k-resize.e {
+  right: -2px;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  cursor: ew-resize;
+}
+.v2k-resize.w {
+  left: -2px;
+  top: 6px;
+  bottom: 6px;
+  width: 4px;
+  cursor: ew-resize;
+}
+.v2k-resize.ne {
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  cursor: nesw-resize;
+}
+.v2k-resize.nw {
+  top: -2px;
+  left: -2px;
+  width: 8px;
+  height: 8px;
+  cursor: nwse-resize;
+}
+.v2k-resize.se {
+  bottom: -2px;
+  right: -2px;
+  width: 10px;
+  height: 10px;
+  cursor: nwse-resize;
+}
+.v2k-resize.sw {
+  bottom: -2px;
+  left: -2px;
+  width: 8px;
+  height: 8px;
+  cursor: nesw-resize;
+}
+
+.v2k-window.maximized .v2k-resize {
+  display: none;
+}
+
+/* --- Taskbar --- */
+.v2k-taskbar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--v2k-taskbar-h);
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 2px 2px 2px 2px;
+  background: var(--v2k-face);
+  border-top: 2px solid var(--v2k-face-light);
+  box-sizing: border-box;
+  z-index: 100000;
+}
+
+.v2k-start-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 8px;
+  font-family: var(--v2k-font);
+  font-size: 11px;
+  font-weight: bold;
+  background: var(--v2k-start-face);
+  color: var(--v2k-start-text);
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.v2k-start-btn.open,
+.v2k-start-btn:active {
+  border-color: var(--v2k-face-darker) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-darker);
+}
+
+.v2k-start-logo {
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #0a246a, #3a6ea5);
+  border: 1px solid #404040;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.v2k-task-buttons {
+  flex: 1;
+  display: flex;
+  gap: 2px;
+  overflow: hidden;
+  padding: 0 2px;
+  min-width: 0;
+}
+
+.v2k-task-btn {
+  max-width: 160px;
+  min-width: 80px;
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 6px;
+  font-family: var(--v2k-font);
+  font-size: 11px;
+  text-align: left;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  background: var(--v2k-face);
+  color: #000;
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  cursor: default;
+}
+
+.v2k-task-btn.active {
+  border-color: var(--v2k-face-darker) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-darker);
+  background: #ece9d8;
+  font-weight: bold;
+}
+
+.v2k-task-btn .glyph {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  background: #fff;
+  border: 1px solid #808080;
+  font-size: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #0a246a;
+}
+
+.v2k-tray {
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--v2k-font);
+  font-size: 11px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--v2k-face-dark) var(--v2k-face-light) var(--v2k-face-light)
+    var(--v2k-face-dark);
+  background: var(--v2k-face);
+  min-width: 64px;
+  justify-content: center;
+}
+
+/* --- Start menu --- */
+.v2k-start-menu {
+  position: fixed;
+  bottom: var(--v2k-taskbar-h);
+  left: 0;
+  width: 220px;
+  background: var(--v2k-menu-face);
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  display: flex;
+  z-index: 100001;
+  box-sizing: border-box;
+}
+
+.v2k-start-stripe {
+  width: 24px;
+  flex-shrink: 0;
+  background: linear-gradient(
+    180deg,
+    var(--v2k-menu-stripe) 0%,
+    #3a6ea5 100%
+  );
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  color: #fff;
+  font-weight: bold;
+  font-size: 14px;
+  letter-spacing: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px 2px;
+  box-sizing: border-box;
+}
+
+.v2k-start-items {
+  flex: 1;
+  padding: 2px 0;
+  list-style: none;
+  margin: 0;
+}
+
+.v2k-start-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 8px;
+  font-family: var(--v2k-font);
+  font-size: 11px;
+  color: #000;
+  cursor: default;
+}
+
+.v2k-start-item:hover,
+.v2k-start-item:focus {
+  background: var(--v2k-menu-highlight);
+  color: var(--v2k-menu-highlight-text);
+  outline: none;
+}
+
+.v2k-start-item .glyph {
+  width: 24px;
+  height: 24px;
+  background: #fff;
+  border: 1px solid #808080;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 11px;
+  color: #0a246a;
+  flex-shrink: 0;
+}
+
+.v2k-start-sep {
+  height: 1px;
+  margin: 4px 4px 4px 36px;
+  background: var(--v2k-face-dark);
+  border-bottom: 1px solid var(--v2k-face-light);
+}
+
+.v2k-start-footer {
+  font-style: italic;
+  color: #555;
+  padding: 4px 12px 8px 36px;
+  font-size: 10px;
+}
+
+/* --- M2: flush app bodies (Notepad / Files / Image Viewer) --- */
+.v2k-window-body.flush {
+  padding: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.v2k-window-body.flush > * {
+  flex: 1;
+  min-height: 0;
+}
+
+/* --- Desktop drag-drop --- */
+.v2k-desktop.drop-target {
+  outline: 3px dashed #fff;
+  outline-offset: -10px;
+}
+
+.v2k-drop-overlay {
+  position: absolute;
+  inset: 40px 40px calc(var(--v2k-taskbar-h) + 40px) 40px;
+  border: 3px dashed rgba(255, 255, 255, 0.85);
+  background: rgba(10, 36, 106, 0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.v2k-drop-toast {
+  position: absolute;
+  bottom: calc(var(--v2k-taskbar-h) + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--v2k-face);
+  border: 2px solid;
+  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
+    var(--v2k-face-light);
+  padding: 6px 14px;
+  z-index: 60;
+  font-size: 11px;
+  color: #000;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.25);
+}
