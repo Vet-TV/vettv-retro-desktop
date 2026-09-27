@@ -53,4 +53,4 @@ Browser “web OS” shells inspired by Windows 98SE, Windows 2000, and Windows 
 ## Live preview
 - https://vet-tv.github.io/vettv-retro-desktop/
 - Repo: https://github.com/Vet-TV/vettv-retro-desktop
-- Deploy path: `gh-pages` branch (Actions workflow needs `workflow` OAuth scope to push later)
+- Deploy: GitHub Actions from `main` (`.github/workflows/deploy-pages.yml`); `gh-pages` was the interim branch

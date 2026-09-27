@@ -77,7 +77,7 @@ Use `/<repo-name>/` when the site is a **project** Pages site (`https://<user>.g
 
 1. Push this repo to GitHub (default branch `main`).
 2. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Push to `main` (or run **Actions → Deploy to GitHub Pages → Run workflow**).
+3. Push to `main` (or run **Actions → Deploy to GitHub Pages → Run workflow**). Actions-from-main is the primary path; an interim `gh-pages` branch deploy may still exist until the first Actions run succeeds.
 4. Workflow: `.github/workflows/deploy-pages.yml` builds `dist` and deploys via `actions/upload-pages-artifact` + `actions/deploy-pages`.
 
 **Live MVP preview:** https://vet-tv.github.io/vettv-retro-desktop/
