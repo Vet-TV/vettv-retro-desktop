@@ -7,7 +7,7 @@
     <div class="about-logo" aria-hidden="true">V</div>
     <div>
       <h2>VetTV Retro Desktop</h2>
-      <p class="tagline">Vet2000 skin · Version 1.0.0</p>
+      <p class="tagline">Vet2000 skin · Version 1.1.0</p>
     </div>
   </div>
 
@@ -21,6 +21,7 @@
     <li>Window manager, taskbar &amp; Start menu</li>
     <li>IndexedDB VFS (C:/ · D:/) · Files · Notepad · Image Viewer</li>
     <li>Working Calculator · session restore on reload</li>
+    <li>Vintage Lab boots user-provided x86 ISO images in the browser</li>
   </ul>
 
   <div class="legal v2k-sunken-thin">
@@ -33,8 +34,9 @@
   </div>
 
   <p class="muted">
-    Does not run <code>.exe</code> or other Win32 binaries. For native BYO-ISO emulation,
-    see sibling product <strong>VetTV Vintage PC</strong>.
+    The desktop shell does not run host <code>.exe</code> files. Vintage Lab can boot
+    user-provided, bootable x86 ISO images in the browser; OS images are never bundled.
+    It does not support 64-bit or ARM systems.
   </p>
 
   <p class="footer muted">© {YEAR} VetTV / VetTV Studios · Original VetTV chrome</p>

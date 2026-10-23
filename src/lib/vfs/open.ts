@@ -33,9 +33,8 @@ export async function openVfsPath(path: string): Promise<void> {
         title: 'Unsupported file type',
         message:
           `"${name}" cannot be opened.\n\n` +
-          `VetTV Retro Desktop does not run .exe or other native programs.\n` +
-          `This is a browser desktop shell — not a Windows emulator.\n\n` +
-          `For real guest OS / BYO-ISO use, see VetTV Vintage PC.`,
+          `The desktop shell does not run host .exe or other native programs.\n` +
+          `To boot a legally obtained, bootable 16/32-bit x86 OS image, open Vintage Lab from Start.`,
       },
       forceNew: true,
     })

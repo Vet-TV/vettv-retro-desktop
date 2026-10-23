@@ -15,5 +15,6 @@ import { defineConfig } from 'vite'
  */
 export default defineConfig({
   plugins: [svelte()],
+  environments: { ssr: { optimizeDeps: { noDiscovery: true, include: [], exclude: ['svelte'] } } },
   base: process.env.VITE_BASE || './',
 })

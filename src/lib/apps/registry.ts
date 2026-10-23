@@ -25,6 +25,12 @@ export const APP_REGISTRY: Record<AppId, AppDefinition> = {
     defaultW: 520,
     defaultH: 380,
   },
+  vintageLab: {
+    id: 'vintageLab',
+    title: 'Vintage Lab — Boot an OS image',
+    defaultW: 900,
+    defaultH: 640,
+  },
   imageViewer: {
     id: 'imageViewer',
     title: 'Image Viewer',
@@ -45,6 +51,7 @@ export const START_MENU_APPS: AppId[] = [
   'files',
   'notepad',
   'calculator',
+  'vintageLab',
   'about',
 ]
 
@@ -58,6 +65,8 @@ export function appGlyph(appId: AppId | string): string {
       return '#'
     case 'files':
       return 'F'
+    case 'vintageLab':
+      return 'V'
     case 'imageViewer':
       return 'I'
     case 'alert':

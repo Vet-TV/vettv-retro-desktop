@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.1.0 - 2026-10-23
+
+- Add Vintage Lab with v86 to boot user-selected, bootable 16/32-bit x86 ISO images in the browser.
+- Keep OS images local to the browser; include only emulator firmware and no operating-system images.
+- Add an optional temporary 512 MB virtual disk for installers.
+
 ## 1.0.0 - 2026-10-23
 
 First stable release of the VetTV Retro Desktop browser shell.

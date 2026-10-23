@@ -9,6 +9,7 @@
   import FilesApp from '../apps/components/FilesApp.svelte'
   import ImageViewerApp from '../apps/components/ImageViewerApp.svelte'
   import AlertApp from '../apps/components/AlertApp.svelte'
+  import VintageLabApp from '../apps/components/VintageLabApp.svelte'
 
   interface Props {
     win: WindowState
@@ -103,7 +104,8 @@
     win.appId === 'notepad' ||
       win.appId === 'files' ||
       win.appId === 'imageViewer' ||
-      win.appId === 'calculator',
+      win.appId === 'calculator' ||
+      win.appId === 'vintageLab',
   )
 
   const style = $derived.by(() => {
@@ -114,12 +116,13 @@
   })
 </script>
 
-{#if !win.minimized}
+{#if !win.minimized || win.appId === 'vintageLab'}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="v2k-window"
     class:active
     class:maximized={win.maximized}
+    class:minimized={win.minimized}
     style={style}
     onpointerdown={() => windowManager.focus(win.id)}
     role="dialog"
@@ -180,6 +183,8 @@
         <CalculatorApp />
       {:else if win.appId === 'files'}
         <FilesApp windowId={win.id} path={win.payload?.path} />
+      {:else if win.appId === 'vintageLab'}
+        <VintageLabApp />
       {:else if win.appId === 'imageViewer'}
         <ImageViewerApp path={win.payload?.path} />
       {:else if win.appId === 'alert'}

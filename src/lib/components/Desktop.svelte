@@ -46,6 +46,10 @@
     windowManager.openApp('about')
   }
 
+  function openVintageLab() {
+    windowManager.openApp('vintageLab')
+  }
+
   function isFileDrag(e: DragEvent): boolean {
     return Array.from(e.dataTransfer?.types ?? []).includes('Files')
   }
@@ -101,6 +105,12 @@
 
   const desktopApps = [
     { id: 'files' as const, label: 'Files', title: 'Files', open: openFiles },
+    {
+      id: 'vintageLab' as const,
+      label: 'Vintage Lab',
+      title: 'Boot your own retro OS image',
+      open: openVintageLab,
+    },
     { id: 'notepad' as const, label: 'Notepad', title: 'Notepad', open: openNotepad },
     {
       id: 'calculator' as const,

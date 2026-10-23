@@ -1,11 +1,11 @@
 # VetTV Retro Desktop
 
 Browser-based classic desktop shell for **VetTV / Retro TV Archive**.  
-1.0 skin: **Vet2000** (Win2000-inspired gray corporate chrome — original VetTV art only).
+Desktop skin: **Vet2000** (Win2000-inspired gray corporate chrome — original VetTV art only).
 
-Not real Windows. **Not affiliated with Microsoft.** Sibling product **VetTV Vintage PC** owns native BYO-ISO emulation — this repo stays a web shell / nostalgia toy.
+Not affiliated with Microsoft. The desktop shell is a browser nostalgia toy; the optional **Vintage Lab** emulates a limited x86 PC to boot your own retro OS image.
 
-**Current release: 1.0.0** — a stable Vet2000 desktop with a local virtual filesystem and built-in apps.
+**Version 1.1.0 adds Vintage Lab:** boot a locally selected, bootable x86 ISO in the browser. No OS image is included or uploaded.
 
 See `PROJECT_BRIEF.md` for the 1.0 release scope and post-1.0 ideas.
 See [CHANGELOG.md](./CHANGELOG.md) for release notes.
@@ -13,6 +13,7 @@ See [CHANGELOG.md](./CHANGELOG.md) for release notes.
 ## Stack
 
 - **Svelte + TypeScript + Vite** (locked)
+- **v86** x86-to-WebAssembly emulator for Vintage Lab
 
 ## How to run (local)
 
@@ -29,6 +30,17 @@ npm run preview  # serve dist locally
 npm run check    # svelte-check + tsc
 npm audit        # check dependencies for known vulnerabilities
 ```
+
+## Boot your own retro OS
+
+1. Open **Vintage Lab** from the Start menu or double-click its desktop icon.
+2. Choose a bootable `.iso` image that you have the right to use.
+3. Select **Boot ISO** and click the virtual screen to send keyboard input.
+4. Optionally attach a temporary blank 512 MB disk for installers. Its contents are discarded when the emulator closes.
+
+The ISO is read locally by your browser and is not sent to the site or stored by the app. Browser memory and device performance limit the image size; images over 2 GiB are not accepted. v86 emulates a single-core, legacy x86 PC: 16/32-bit bootable systems such as DOS, Windows 95/98/2000, and compatible Linux or hobby OS images may work. It does **not** support 64-bit x86, ARM, every OS, or every installer. Some systems need their own boot options or setup steps. A local virtual disk is temporary and does not survive closing the emulator or refreshing the page.
+
+No operating-system ISO is bundled. You are responsible for providing images that you are legally entitled to use. This does not make the desktop shell a Windows emulator or allow host `.exe` files to run.
 
 ## Milestone 1 — done criteria
 
@@ -63,7 +75,7 @@ npm audit        # check dependencies for known vulnerabilities
 - [x] README + PROJECT_BRIEF mark M3 done
 - [x] `npm run build` and `npm run check` succeed
 
-**Out of scope for M3 (deferred):** App Market, Vet98 / VetXP themes, custom domain, Vintage Lab / v86, media playback.
+**Out of scope for M3 (deferred):** App Market, Vet98 / VetXP themes, custom domain, media playback.
 
 ## Post-1.0 ideas
 
@@ -128,6 +140,7 @@ Curated chrome under `public/themes/vet2000/` (incoming packs stay in `art-incom
 public/
   favicon.svg
   themes/vet2000/      # art batch 1 wallpaper + SVG/PNG chrome
+  v86/                 # v86 WebAssembly runtime + licensed BIOS firmware (no OS images)
 src/
   App.svelte
   main.ts
@@ -137,7 +150,7 @@ src/
     types.ts
     apps/registry.ts
     apps/icons.ts      # Vet2000 asset URLs
-    apps/components/   # About, Notepad, Files, ImageViewer, Calculator, Alert
+    apps/components/   # About, Notepad, Files, ImageViewer, Calculator, Vintage Lab, Alert
     stores/windowManager.ts
     vfs/               # IndexedDB VFS (paths, idb, mime, open)
     components/
@@ -149,13 +162,17 @@ src/
 PROJECT_BRIEF.md
 ```
 
+Third-party emulator and firmware license notices are in `public/v86/THIRD_PARTY_NOTICES.md`.
+
 ## Manual verify (1.0)
 
 1. `npm run dev` → open desktop.
 2. Double-click **Calculator** (or Start → Calculator) → try `7 + 3 =` → `10`; divide by zero → Error; Esc clears.
 3. Refresh → Calculator window restores if left open.
 4. Start → About → read legal disclaimer (not affiliated with Microsoft).
-5. Files / Notepad still open/save; `.exe` still shows unsupported alert only.
+5. Vintage Lab → choose a bootable x86 ISO → Boot ISO; verify that the guest begins booting and Pause/Start/Restart work.
+6. Verify the ISO stays local and that unsupported 64-bit or non-x86 guests are identified as out of scope.
+7. Files / Notepad still open/save; host `.exe` files still show the unsupported alert.
 
 ## Package
 

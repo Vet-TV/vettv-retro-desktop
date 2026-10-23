@@ -4,6 +4,7 @@ export type AppId =
   | 'notepad'
   | 'calculator'
   | 'files'
+  | 'vintageLab'
   | 'imageViewer'
   | 'alert'
 
