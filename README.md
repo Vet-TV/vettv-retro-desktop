@@ -1,11 +1,14 @@
 # VetTV Retro Desktop
 
 Browser-based classic desktop shell for **VetTV / Retro TV Archive**.  
-MVP launch skin: **Vet2000** (Win2000-inspired gray corporate chrome — original VetTV art only).
+1.0 skin: **Vet2000** (Win2000-inspired gray corporate chrome — original VetTV art only).
 
 Not real Windows. **Not affiliated with Microsoft.** Sibling product **VetTV Vintage PC** owns native BYO-ISO emulation — this repo stays a web shell / nostalgia toy.
 
-See `PROJECT_BRIEF.md` for product scope and eras (Vet2000 → Vet98 / VetXP later).
+**Current release: 1.0.0** — a stable Vet2000 desktop with a local virtual filesystem and built-in apps.
+
+See `PROJECT_BRIEF.md` for the 1.0 release scope and post-1.0 ideas.
+See [CHANGELOG.md](./CHANGELOG.md) for release notes.
 
 ## Stack
 
@@ -24,6 +27,7 @@ Then open the URL Vite prints (usually `http://localhost:5173/`).
 npm run build    # production build → dist/
 npm run preview  # serve dist locally
 npm run check    # svelte-check + tsc
+npm audit        # check dependencies for known vulnerabilities
 ```
 
 ## Milestone 1 — done criteria
@@ -61,15 +65,16 @@ npm run check    # svelte-check + tsc
 
 **Out of scope for M3 (deferred):** App Market, Vet98 / VetXP themes, custom domain, Vintage Lab / v86, media playback.
 
-## What’s next (V1 / later)
+## Post-1.0 ideas
 
 - Vet98 + VetXP theme packs
 - App Market (iframe web apps + postMessage API)
 - Optional media playback stubs / 1–2 web remake games
+- Multi-user local profiles
 
-## Deploy — GitHub Pages (MVP host)
+## Deploy — GitHub Pages
 
-MVP hosting is **GitHub Pages**. A custom VetTV domain is **post-MVP**.
+Hosting is **GitHub Pages**. A custom VetTV domain remains deferred.
 
 ### Vite `base`
 
@@ -88,7 +93,7 @@ Use `/<repo-name>/` when the site is a **project** Pages site (`https://<user>.g
 3. Push to `main` (or run **Actions → Deploy to GitHub Pages → Run workflow**).
 4. Workflow: `.github/workflows/deploy-pages.yml` builds `dist` and deploys via `actions/upload-pages-artifact` + `actions/deploy-pages`.
 
-**Live MVP preview:** https://vet-tv.github.io/vettv-retro-desktop/
+**Live preview:** https://vet-tv.github.io/vettv-retro-desktop/
 
 ### Expected URL shape
 
@@ -97,7 +102,7 @@ Use `/<repo-name>/` when the site is a **project** Pages site (`https://<user>.g
 | Project site | `https://<user-or-org>.github.io/<repo-name>/` |
 | User/org root site | `https://<user-or-org>.github.io/` |
 
-Custom VetTV domain: configure later (post-MVP); leave Pages default hostname until then.
+Custom VetTV domain: configure later; leave Pages default hostname until then.
 
 ## Legal / brand
 
@@ -144,7 +149,7 @@ src/
 PROJECT_BRIEF.md
 ```
 
-## Manual verify (M3)
+## Manual verify (1.0)
 
 1. `npm run dev` → open desktop.
 2. Double-click **Calculator** (or Start → Calculator) → try `7 + 3 =` → `10`; divide by zero → Error; Esc clears.

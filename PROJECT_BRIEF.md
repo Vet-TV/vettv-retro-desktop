@@ -1,6 +1,6 @@
 # VetTV Retro Desktop — Project brief
 
-Status: M3 complete (Calculator + polish + About/legal) (2026-09-26 PT)  
+Status: 1.0.0 release scope complete (Vet2000 desktop)
 Owner bot: VetTV Retro Desktop  
 Brand: VetTV / VetTV Studios / Retro TV Archive
 
@@ -16,28 +16,25 @@ Browser “web OS” shells inspired by Windows 98SE, Windows 2000, and Windows 
 - **Svelte + Vite** — stick for the whole product
 
 ## Eras (skins)
-1. **Vet2000** — Win2000-inspired — **MVP launch skin (locked)**
-2. Vet98 — 98SE-inspired — V1 theme pack
-3. VetXP — XP-inspired (Luna-like colors, original art) — V1 theme pack
+1. **Vet2000** — Win2000-inspired — 1.0 release skin
+2. Vet98 — 98SE-inspired — post-1.0 idea
+3. VetXP — XP-inspired colors with original art — post-1.0 idea
 
 ## Session
 - **Restart: restore last session** (reopen windows/apps/layout; VFS unchanged) — locked
 - Window layout: `localStorage` (`vettv-retro-desktop-session-v1`)
 - VFS: IndexedDB (`vettv-vfs-v1`) — survives refresh independently
 
-## MVP
+## 1.0 release scope
 - Boot → desktop for **Vet2000**
 - Window manager + taskbar/Start
 - VFS with Documents + drag-drop upload
 - Apps: Files, Notepad, Calculator (working), Image Viewer, About
 - Session restore on reload
-- Deploy static site
+- GitHub Pages static site; dependency audit, type-check, and production build in CI
+- No executable or remote app execution
 
-## V1
-- All three era themes (add Vet98 + VetXP)
-- App Market (iframe web apps + postMessage API)
-- 1–2 web remake games
-- Multi-user local profiles (optional)
+The previously proposed Vet98/VetXP themes, iframe-based App Market, web remake games, and local profiles are not part of 1.0. Revisit them as separate, scoped post-1.0 work.
 
 ## Stretch
 - Separate “Vintage Lab” page embedding v86 + BYO images only (stretch-only; not MVP)
@@ -46,8 +43,8 @@ Browser “web OS” shells inspired by Windows 98SE, Windows 2000, and Windows 
 ## Sibling product
 - VetTV Vintage PC = paid native emulator frontend (real guests, BYO ISO)
 
-## Host (locked)
-- **GitHub Pages** for MVP; custom VetTV domain can alias later
+## Host
+- **GitHub Pages**; custom domain can be considered later
 
 ## Live preview
 - https://vet-tv.github.io/vettv-retro-desktop/

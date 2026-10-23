@@ -5,6 +5,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -13,7 +15,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -32,6 +34,12 @@ jobs:
       - name: Install
         run: npm ci
 
+      - name: Audit dependencies
+        run: npm audit
+
+      - name: Check
+        run: npm run check
+
       # Relative base works for project or user Pages sites.
       # For absolute project base, set:
       #   VITE_BASE: /${{ github.event.repository.name }}/
@@ -41,12 +49,14 @@ jobs:
           VITE_BASE: ./
 
       - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
   deploy:
     needs: build
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment:
       name: github-pages

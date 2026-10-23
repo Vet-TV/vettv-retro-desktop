@@ -7,7 +7,7 @@
     <div class="about-logo" aria-hidden="true">V</div>
     <div>
       <h2>VetTV Retro Desktop</h2>
-      <p class="tagline">Vet2000 skin · Milestone 3</p>
+      <p class="tagline">Vet2000 skin · Version 1.0.0</p>
     </div>
   </div>
 
