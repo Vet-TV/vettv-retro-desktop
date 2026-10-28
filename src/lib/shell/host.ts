@@ -21,11 +21,21 @@ export async function canClose(windowId: string): Promise<boolean> {
 export async function requestClose(windowId: string): Promise<boolean> {
   if (!(await canClose(windowId))) return false
   guards.delete(windowId)
+  hosts.delete(windowId)
   windowManager.close(windowId)
   return true
 }
 
-export function createHost(windowId: string, appId: AppId): AppHost {
+const hosts = new Map<string, AppHost>()
+
+/** Stable host per window (same object for the window's lifetime). */
+export function getHost(windowId: string, appId: AppId): AppHost {
+  let h = hosts.get(windowId)
+  if (!h || h.appId !== appId) hosts.set(windowId, (h = createHost(windowId, appId)))
+  return h
+}
+
+function createHost(windowId: string, appId: AppId): AppHost {
   return {
     windowId,
     appId,

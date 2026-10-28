@@ -2,7 +2,7 @@
   import type { WindowState } from '../types'
   import { windowManager } from '../stores/windowManager'
   import { appGlyph, appIcon, getApp } from '../apps/registry'
-  import { createHost, requestClose } from '../shell/host'
+  import { getHost, requestClose } from '../shell/host'
   import type { Component } from 'svelte'
 
   interface Props {
@@ -17,7 +17,7 @@
   const MIN_W = $derived(manifest?.window.minW ?? 180)
   const MIN_H = $derived(manifest?.window.minH ?? 100)
   const resizable = $derived(manifest?.window.resizable !== false)
-  const host = $derived(createHost(win.id, win.appId))
+  const host = $derived(getHost(win.id, win.appId))
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const loaded = $derived<Promise<Component<any> | null>>(

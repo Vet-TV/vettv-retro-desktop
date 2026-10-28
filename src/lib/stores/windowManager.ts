@@ -166,6 +166,9 @@ function createWindowManager() {
 
     /** Set/clear payload.path and recompute the title from the manifest. */
     setFilePath(id: string, path: string | null) {
+      const cur = get({ subscribe }).find((w) => w.id === id)
+      if (cur && (cur.payload?.path ?? null) === path && cur.title === titleFor(cur.appId, cur.payload))
+        return
       commit((wins) =>
         wins.map((w) => {
           if (w.id !== id) return w
@@ -185,6 +188,7 @@ function createWindowManager() {
     },
 
     setTitle(id: string, title: string) {
+      if (get({ subscribe }).find((w) => w.id === id)?.title === title) return
       commit((wins) => wins.map((w) => (w.id === id ? { ...w, title } : w)))
     },
 
