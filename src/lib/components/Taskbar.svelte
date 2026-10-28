@@ -39,6 +39,15 @@
     startOpen = false
   }
 
+  function ctxAction(action: 'restore' | 'minimize' | 'close') {
+    const id = ctx?.id
+    ctx = null
+    if (!id) return
+    if (action === 'restore') windowManager.restore(id)
+    else if (action === 'minimize') windowManager.minimize(id)
+    else void requestClose(id)
+  }
+
   function onDocPointer(e: PointerEvent) {
     if (ctx && !(e.target as HTMLElement).closest('.rd-task-menu')) ctx = null
     if (!startOpen) return
@@ -53,11 +62,10 @@
 <StartMenu open={startOpen} onclose={closeStart} />
 
 {#if ctx}
-  {@const id = ctx.id}
   <div class="rd-task-menu rd-panel" role="menu" style={`left:${ctx.x}px`}>
-    <button type="button" role="menuitem" class="v2k-start-item" onclick={() => { windowManager.restore(id); ctx = null }}>Restore</button>
-    <button type="button" role="menuitem" class="v2k-start-item" onclick={() => { windowManager.minimize(id); ctx = null }}>Minimize</button>
-    <button type="button" role="menuitem" class="v2k-start-item" onclick={() => { ctx = null; void requestClose(id) }}>Close</button>
+    <button type="button" role="menuitem" class="v2k-start-item" onclick={() => ctxAction('restore')}>Restore</button>
+    <button type="button" role="menuitem" class="v2k-start-item" onclick={() => ctxAction('minimize')}>Minimize</button>
+    <button type="button" role="menuitem" class="v2k-start-item" onclick={() => ctxAction('close')}>Close</button>
   </div>
 {/if}
 
@@ -118,5 +126,6 @@
     flex-direction: column;
     min-width: 120px;
     padding: 2px;
+    height: auto;
   }
 </style>

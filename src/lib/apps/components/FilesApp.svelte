@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte'
   import {
     exists,
     joinPath,
@@ -39,10 +40,13 @@
   let fileInput: HTMLInputElement | undefined = $state()
 
   // Sync external path payload (e.g. open folder from desktop drop)
+  // Only react when the payload path changes from outside (not our own setFilePath echo)
+  let lastExternal: string | undefined
   $effect(() => {
-    if (path && path !== cwd) {
-      void navigate(path)
-    }
+    const p = path
+    if (p === lastExternal) return
+    lastExternal = p
+    if (p && p !== untrack(() => cwd)) void navigate(p)
   })
 
   // Refresh listing when VFS mutates
@@ -61,6 +65,7 @@
         entries = await listDir(cwd)
         status = `${entries.length} object(s)`
       }
+      lastExternal = cwd || undefined
       host.setFilePath(cwd || null)
     } catch (e) {
       error = e instanceof Error ? e.message : 'Failed to list'
