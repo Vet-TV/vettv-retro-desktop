@@ -1,5 +1,7 @@
 import { windowManager } from '../stores/windowManager'
-import { isExeExt, isImageExt, isTextExt } from './mime'
+import { isExeExt } from './mime'
+import { appForPath } from '../shell/associations'
+import { getApp } from '../apps/registry'
 import { baseName, extName } from './paths'
 import { getMeta } from './vfs'
 
@@ -41,16 +43,9 @@ export async function openVfsPath(path: string): Promise<void> {
     return
   }
 
-  if (isTextExt(name) || meta.mime?.startsWith('text/')) {
-    windowManager.openApp('notepad', { payload: { path: meta.path } })
-    return
-  }
-
-  if (isImageExt(name) || meta.mime?.startsWith('image/')) {
-    windowManager.openApp('imageViewer', {
-      payload: { path: meta.path },
-      multi: true,
-    })
+  const appId = appForPath(meta.path)
+  if (appId) {
+    openPathWith(meta.path, appId)
     return
   }
 
@@ -59,8 +54,18 @@ export async function openVfsPath(path: string): Promise<void> {
       title: 'Cannot open file',
       message:
         `No app is registered for "${name}" (${extName(name) || 'unknown type'}).\n\n` +
-        `Supported in Milestone 2: .txt in Notepad, images (.png/.jpg/.webp/.gif) in Image Viewer.`,
+        `Use "Open with…" in Files to pick an app.`,
     },
     forceNew: true,
+  })
+}
+
+/** Open a file path in a specific app (Files "Open with…"). */
+export function openPathWith(path: string, appId: string): void {
+  const app = getApp(appId)
+  if (!app) return
+  windowManager.openApp(appId, {
+    payload: { path },
+    multi: app.window.multiInstance,
   })
 }

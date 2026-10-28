@@ -17,4 +17,4 @@ export {
   uniqueChildPath,
   uploadBrowserFiles,
 } from './vfs'
-export { openVfsPath } from './open'
+export { openVfsPath, openPathWith } from './open'

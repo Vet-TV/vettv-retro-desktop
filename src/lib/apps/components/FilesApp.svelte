@@ -5,6 +5,7 @@
     listDir,
     listDrives,
     mkdir,
+    openPathWith,
     openVfsPath,
     parentPath,
     remove,
@@ -14,14 +15,17 @@
     vfsRevision,
     type VfsMeta,
   } from '../../vfs'
-  import { windowManager } from '../../stores/windowManager'
+  import type { AppHost } from '../../types'
+  import { shellOpenWith } from '../../shell/dialogs'
+  import { setAssociation } from '../../shell/associations'
+  import { extName } from '../../vfs'
 
   interface Props {
-    windowId: string
+    host: AppHost
     path?: string
   }
 
-  let { windowId, path }: Props = $props()
+  let { host, path }: Props = $props()
 
   let cwd = $state('C:/')
   let entries = $state<VfsMeta[]>([])
@@ -57,7 +61,7 @@
         entries = await listDir(cwd)
         status = `${entries.length} object(s)`
       }
-      windowManager.setPayload(windowId, { path: cwd || undefined })
+      host.setFilePath(cwd || null)
     } catch (e) {
       error = e instanceof Error ? e.message : 'Failed to list'
       entries = []
@@ -95,6 +99,19 @@
       return
     }
     await openVfsPath(entry.path)
+  }
+
+  const selectedFile = $derived(
+    entries.find((e) => e.path === selected && e.kind === 'file') ?? null,
+  )
+
+  async function openWith() {
+    const target = selectedFile
+    if (!target) return
+    const choice = await shellOpenWith(target.path)
+    if (!choice) return
+    if (choice.remember && extName(target.path)) setAssociation(extName(target.path), choice.appId)
+    openPathWith(target.path, choice.appId)
   }
 
   function onRowDblClick(entry: VfsMeta) {
@@ -141,7 +158,7 @@
       return
     }
     const label = meta.kind === 'dir' ? `folder "${meta.name}" and its contents` : `"${meta.name}"`
-    if (!confirm(`Delete ${label}?`)) return
+    if (!(await host.confirm(`Delete ${label}?`, 'Confirm Delete'))) return
     try {
       await remove(meta.path)
       selected = null
@@ -226,6 +243,13 @@
     <button type="button" class="v2k-btn" onclick={startRename} disabled={!selected}>Rename</button>
     <button type="button" class="v2k-btn" onclick={() => void doDelete()} disabled={!selected}
       >Delete</button
+    >
+    <button
+      type="button"
+      class="v2k-btn"
+      onclick={() => void openWith()}
+      disabled={!selectedFile}
+      title="Choose which app opens this file">Open with…</button
     >
     <button type="button" class="v2k-btn" onclick={() => fileInput?.click()}>Upload…</button>
     <input

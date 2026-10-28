@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { windowManager } from '../../stores/windowManager'
+  import type { AppHost } from '../../types'
 
   interface Props {
-    windowId: string
+    host: AppHost
     message?: string
     title?: string
   }
 
-  let { windowId, message = 'Something went wrong.', title }: Props = $props()
+  let { host, message = 'Something went wrong.', title }: Props = $props()
 </script>
 
 <div class="app-alert">
@@ -19,7 +19,7 @@
     <pre class="app-alert-msg">{message}</pre>
   </div>
   <div class="app-alert-actions">
-    <button type="button" class="v2k-btn" onclick={() => windowManager.close(windowId)}>
+    <button type="button" class="v2k-btn" onclick={() => void host.close()}>
       OK
     </button>
   </div>

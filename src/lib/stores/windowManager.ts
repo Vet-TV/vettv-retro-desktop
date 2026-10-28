@@ -19,11 +19,9 @@ function titleFor(appId: AppId, payload?: WindowPayload, override?: string): str
   if (override) return override
   if (payload?.title) return payload.title
   const def = APP_REGISTRY[appId]
-  if (payload?.path) {
-    const name = baseName(payload.path)
-    if (appId === 'notepad') return `${name} — Notepad`
-    if (appId === 'imageViewer') return `${name} — Image Viewer`
-    if (appId === 'files') return `Files — ${payload.path}`
+  if (payload?.path && def) {
+    if (def.titleForPath) return def.titleForPath(payload.path)
+    return `${baseName(payload.path)} — ${def.title}`
   }
   return def?.title ?? 'App'
 }
@@ -40,7 +38,7 @@ function loadPersisted(): PersistedWindow[] {
         typeof w.id === 'string' &&
         typeof w.title === 'string' &&
         typeof w.appId === 'string' &&
-        APP_REGISTRY[w.appId as AppId],
+        APP_REGISTRY[w.appId],
     )
   } catch {
     return []
@@ -101,7 +99,7 @@ function createWindowManager() {
       const def = APP_REGISTRY[appId]
       if (!def) return
 
-      const multi = opts.multi || opts.forceNew || def.multiInstance
+      const multi = opts.multi || opts.forceNew || def.window.multiInstance
       const payload = opts.payload
 
       if (!multi) {
@@ -142,8 +140,8 @@ function createWindowManager() {
         appId,
         x: 80 + cascade,
         y: 60 + cascade,
-        w: def.defaultW,
-        h: def.defaultH,
+        w: def.window.w,
+        h: def.window.h,
         minimized: false,
         maximized: false,
         zIndex: nextZ++,
@@ -163,6 +161,26 @@ function createWindowManager() {
             title: title ?? titleFor(w.appId, payload),
           }
         }),
+      )
+    },
+
+    /** Set/clear payload.path and recompute the title from the manifest. */
+    setFilePath(id: string, path: string | null) {
+      commit((wins) =>
+        wins.map((w) => {
+          if (w.id !== id) return w
+          const payload: WindowPayload = { ...(w.payload ?? {}) }
+          if (path) payload.path = path
+          else delete payload.path
+          return { ...w, payload, title: titleFor(w.appId, payload) }
+        }),
+      )
+    },
+
+    /** Merge keys into payload without touching the title. */
+    patchPayload(id: string, patch: Partial<WindowPayload>) {
+      commit((wins) =>
+        wins.map((w) => (w.id === id ? { ...w, payload: { ...(w.payload ?? {}), ...patch } } : w)),
       )
     },
 
@@ -237,10 +255,11 @@ function createWindowManager() {
       commit((wins) =>
         wins.map((win) => {
           if (win.id !== id || win.maximized) return win
+          const o = APP_REGISTRY[win.appId]?.window
           return {
             ...win,
-            w: Math.max(180, w),
-            h: Math.max(100, h),
+            w: Math.max(o?.minW ?? 180, w),
+            h: Math.max(o?.minH ?? 100, h),
             x: x !== undefined ? Math.max(0, x) : win.x,
             y: y !== undefined ? Math.max(0, y) : win.y,
           }

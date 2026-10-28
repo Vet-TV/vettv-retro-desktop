@@ -1,27 +1,27 @@
 <script lang="ts">
-  import { windowManager } from '../../stores/windowManager'
-  import {
-    exists,
-    joinPath,
-    readText,
-    sanitizeName,
-    writeFile,
-  } from '../../vfs'
+  import type { AppHost } from '../../types'
 
   interface Props {
-    windowId: string
+    host: AppHost
     path?: string
   }
 
-  let { windowId, path }: Props = $props()
+  let { host, path }: Props = $props()
+  const vfs = $derived(host.vfs)
 
   let content = $state('')
   let currentPath = $state<string | undefined>(undefined)
   let dirty = $state(false)
   let status = $state('')
-  let showSaveAs = $state(false)
-  let saveAsName = $state('Untitled.txt')
   let loading = $state(false)
+
+  $effect(() =>
+    host.onBeforeClose(async () => {
+      if (!dirty) return true
+      const name = currentPath?.split('/').pop() ?? 'Untitled'
+      return host.confirm(`"${name}" has unsaved changes.\nClose without saving?`, 'Notepad')
+    }),
+  )
 
   async function loadPath(p: string | undefined) {
     if (!p) {
@@ -31,15 +31,14 @@
       status = 'Untitled'
       return
     }
-    if (p === currentPath && !dirty) return
+    if (p === currentPath) return
     loading = true
     status = 'Loading…'
     try {
-      content = await readText(p)
+      content = await vfs.readText(p)
       currentPath = p
       dirty = false
       status = p
-      windowManager.setPayload(windowId, { path: p })
     } catch (e) {
       status = e instanceof Error ? e.message : 'Failed to open'
     } finally {
@@ -56,87 +55,62 @@
     dirty = true
   }
 
-  async function save() {
-    if (!currentPath) {
-      openSaveAs()
-      return
-    }
+  async function writeTo(dest: string) {
     try {
-      await writeFile(currentPath, content, 'text/plain')
+      await vfs.writeFile(dest, content, 'text/plain')
+      currentPath = dest
       dirty = false
-      status = `Saved ${currentPath}`
-      windowManager.setPayload(windowId, { path: currentPath })
+      status = `Saved ${dest}`
+      host.setFilePath(dest)
     } catch (e) {
       status = e instanceof Error ? e.message : 'Save failed'
     }
   }
 
-  function openSaveAs() {
-    const base = currentPath?.split('/').pop() || 'Untitled.txt'
-    saveAsName = base.endsWith('.txt') ? base : `${base}.txt`
-    showSaveAs = true
+  async function save() {
+    if (!currentPath) return saveAs()
+    await writeTo(currentPath)
   }
 
-  async function confirmSaveAs() {
-    let name = sanitizeName(saveAsName.trim() || 'Untitled.txt')
-    if (!/\.[^.]+$/.test(name)) name = `${name}.txt`
-    const dest = joinPath('C:/Documents', name)
-    try {
-      if ((await exists(dest)) && dest !== currentPath) {
-        const ok = confirm(`"${name}" already exists. Overwrite?`)
-        if (!ok) return
-      }
-      await writeFile(dest, content, 'text/plain')
-      currentPath = dest
-      dirty = false
-      showSaveAs = false
-      status = `Saved ${dest}`
-      windowManager.setPayload(windowId, { path: dest })
-    } catch (e) {
-      status = e instanceof Error ? e.message : 'Save As failed'
-    }
+  async function saveAs() {
+    const dest = await host.pickFile({
+      mode: 'save',
+      extensions: ['.txt'],
+      defaultPath: currentPath ?? 'C:/Documents/Untitled.txt',
+    })
+    if (dest) await writeTo(dest)
   }
 
-  function newDoc() {
-    if (dirty && !confirm('Discard unsaved changes?')) return
+  async function openDoc() {
+    if (dirty && !(await host.confirm('Discard unsaved changes?', 'Notepad'))) return
+    const p = await host.pickFile({ mode: 'open', defaultPath: currentPath ?? 'C:/Documents' })
+    if (!p) return
+    currentPath = undefined
+    host.setFilePath(p)
+  }
+
+  async function newDoc() {
+    if (dirty && !(await host.confirm('Discard unsaved changes?', 'Notepad'))) return
     currentPath = undefined
     content = ''
     dirty = false
     status = 'Untitled'
-    windowManager.setPayload(windowId, {})
-    windowManager.setTitle(windowId, 'Notepad')
+    host.setFilePath(null)
   }
 </script>
 
 <div class="notepad">
   <div class="notepad-menu" role="toolbar" aria-label="Notepad">
-    <button type="button" class="v2k-btn" onclick={newDoc}>New</button>
+    <button type="button" class="v2k-btn" onclick={() => void newDoc()}>New</button>
+    <button type="button" class="v2k-btn" onclick={() => void openDoc()}>Open…</button>
     <button type="button" class="v2k-btn" onclick={() => void save()} disabled={loading}>
       Save
     </button>
-    <button type="button" class="v2k-btn" onclick={openSaveAs}>Save As…</button>
+    <button type="button" class="v2k-btn" onclick={() => void saveAs()}>Save As…</button>
     {#if dirty}
       <span class="dirty" title="Unsaved changes">●</span>
     {/if}
   </div>
-
-  {#if showSaveAs}
-    <div class="save-as">
-      <label>
-        Save to C:/Documents/
-        <input
-          class="v2k-input"
-          bind:value={saveAsName}
-          onkeydown={(e) => {
-            if (e.key === 'Enter') void confirmSaveAs()
-            if (e.key === 'Escape') showSaveAs = false
-          }}
-        />
-      </label>
-      <button type="button" class="v2k-btn" onclick={() => void confirmSaveAs()}>Save</button>
-      <button type="button" class="v2k-btn" onclick={() => (showSaveAs = false)}>Cancel</button>
-    </div>
-  {/if}
 
   <textarea
     class="notepad-editor"
@@ -171,31 +145,6 @@
     color: #a00;
     font-size: 14px;
     margin-left: 4px;
-  }
-  .save-as {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 6px;
-    background: #ece9d8;
-    border-bottom: 1px solid #808080;
-    flex-wrap: wrap;
-    flex-shrink: 0;
-  }
-  .save-as label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    flex: 1;
-    min-width: 160px;
-  }
-  .v2k-input {
-    flex: 1;
-    font-family: Tahoma, sans-serif;
-    font-size: 11px;
-    padding: 2px 4px;
-    border: 2px solid;
-    border-color: #808080 #fff #fff #808080;
   }
   .notepad-editor {
     flex: 1;

@@ -1,15 +1,9 @@
 <script lang="ts">
   import type { WindowState } from '../types'
   import { windowManager } from '../stores/windowManager'
-  import { appGlyph } from '../apps/registry'
-  import { appIcon } from '../apps/icons'
-  import AboutApp from '../apps/components/AboutApp.svelte'
-  import NotepadApp from '../apps/components/NotepadApp.svelte'
-  import CalculatorApp from '../apps/components/CalculatorApp.svelte'
-  import FilesApp from '../apps/components/FilesApp.svelte'
-  import ImageViewerApp from '../apps/components/ImageViewerApp.svelte'
-  import AlertApp from '../apps/components/AlertApp.svelte'
-  import VintageLabApp from '../apps/components/VintageLabApp.svelte'
+  import { appGlyph, appIcon, getApp } from '../apps/registry'
+  import { createHost, requestClose } from '../shell/host'
+  import type { Component } from 'svelte'
 
   interface Props {
     win: WindowState
@@ -19,8 +13,16 @@
   let { win, active }: Props = $props()
 
   const TASKBAR_H = 30
-  const MIN_W = 180
-  const MIN_H = 100
+  const manifest = $derived(getApp(win.appId))
+  const MIN_W = $derived(manifest?.window.minW ?? 180)
+  const MIN_H = $derived(manifest?.window.minH ?? 100)
+  const resizable = $derived(manifest?.window.resizable !== false)
+  const host = $derived(createHost(win.id, win.appId))
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const loaded = $derived<Promise<Component<any> | null>>(
+    manifest ? manifest.load().then((m) => m.default) : Promise.resolve(null),
+  )
 
   type Edge = 'n' | 's' | 'e' | 'w' | 'ne' | 'nw' | 'se' | 'sw'
 
@@ -49,6 +51,7 @@
   }
 
   function onTitleDblClick() {
+    if (!resizable) return
     windowManager.toggleMaximize(win.id)
   }
 
@@ -100,13 +103,7 @@
     window.addEventListener('pointerup', onUp)
   }
 
-  const flushBody = $derived(
-    win.appId === 'notepad' ||
-      win.appId === 'files' ||
-      win.appId === 'imageViewer' ||
-      win.appId === 'calculator' ||
-      win.appId === 'vintageLab',
-  )
+  const flushBody = $derived(manifest?.window.flushBody === true)
 
   const style = $derived.by(() => {
     if (win.maximized) {
@@ -116,7 +113,7 @@
   })
 </script>
 
-{#if !win.minimized || win.appId === 'vintageLab'}
+{#if !win.minimized || manifest?.window.keepAliveWhenMinimized}
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="v2k-window"
@@ -136,8 +133,8 @@
       ondblclick={onTitleDblClick}
     >
       <span class="v2k-titlebar-icon" aria-hidden="true">
-        {#if appIcon(win.appId)}
-          <img src={appIcon(win.appId)} alt="" width="16" height="16" draggable="false" />
+        {#if appIcon(win.appId, 16)}
+          <img src={appIcon(win.appId, 16)} alt="" width="16" height="16" draggable="false" />
         {:else}
           {appGlyph(win.appId)}
         {/if}
@@ -153,6 +150,7 @@
             windowManager.minimize(win.id)
           }}>_</button
         >
+        {#if resizable}
         <button
           type="button"
           class="v2k-title-btn"
@@ -162,43 +160,41 @@
             windowManager.toggleMaximize(win.id)
           }}>{win.maximized ? '❐' : '□'}</button
         >
+        {/if}
         <button
           type="button"
           class="v2k-title-btn close"
           aria-label="Close"
           onclick={(e) => {
             e.stopPropagation()
-            windowManager.close(win.id)
+            void requestClose(win.id)
           }}>×</button
         >
       </div>
     </div>
 
     <div class="v2k-window-body" class:flush={flushBody}>
-      {#if win.appId === 'about'}
-        <AboutApp />
-      {:else if win.appId === 'notepad'}
-        <NotepadApp windowId={win.id} path={win.payload?.path} />
-      {:else if win.appId === 'calculator'}
-        <CalculatorApp />
-      {:else if win.appId === 'files'}
-        <FilesApp windowId={win.id} path={win.payload?.path} />
-      {:else if win.appId === 'vintageLab'}
-        <VintageLabApp />
-      {:else if win.appId === 'imageViewer'}
-        <ImageViewerApp path={win.payload?.path} />
-      {:else if win.appId === 'alert'}
-        <AlertApp
-          windowId={win.id}
-          message={win.payload?.message}
-          title={win.payload?.title}
-        />
-      {:else}
-        <p>Unknown app.</p>
-      {/if}
+      {#await loaded}
+        <p class="v2k-app-loading">Loading…</p>
+      {:then AppComponent}
+        {#if AppComponent}
+          <AppComponent
+            {host}
+            windowId={win.id}
+            payload={win.payload}
+            path={win.payload?.path}
+            message={win.payload?.message}
+            title={win.payload?.title}
+          />
+        {:else}
+          <p>Unknown app.</p>
+        {/if}
+      {:catch err}
+        <p>Failed to load app: {err instanceof Error ? err.message : String(err)}</p>
+      {/await}
     </div>
 
-    {#if !win.maximized}
+    {#if !win.maximized && resizable}
       <!-- svelte-ignore a11y_no_static_element_interactions -->
       <div class="v2k-resize n" onpointerdown={(e) => startResize('n', e)}></div>
       <div class="v2k-resize s" onpointerdown={(e) => startResize('s', e)}></div>

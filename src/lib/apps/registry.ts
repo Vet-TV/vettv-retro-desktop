@@ -1,77 +1,52 @@
-import type { AppDefinition, AppId } from '../types'
+import type { AppId, AppManifest } from '../types'
 
-export const APP_REGISTRY: Record<AppId, AppDefinition> = {
-  about: {
-    id: 'about',
-    title: 'About VetTV Retro Desktop',
-    defaultW: 440,
-    defaultH: 420,
-  },
-  notepad: {
-    id: 'notepad',
-    title: 'Notepad',
-    defaultW: 480,
-    defaultH: 360,
-  },
-  calculator: {
-    id: 'calculator',
-    title: 'Calculator',
-    defaultW: 260,
-    defaultH: 320,
-  },
-  files: {
-    id: 'files',
-    title: 'Files',
-    defaultW: 520,
-    defaultH: 380,
-  },
-  vintageLab: {
-    id: 'vintageLab',
-    title: 'Vintage Lab — Boot an OS image',
-    defaultW: 900,
-    defaultH: 640,
-  },
-  imageViewer: {
-    id: 'imageViewer',
-    title: 'Image Viewer',
-    defaultW: 480,
-    defaultH: 400,
-    multiInstance: true,
-  },
-  alert: {
-    id: 'alert',
-    title: 'VetTV Retro Desktop',
-    defaultW: 420,
-    defaultH: 220,
-    multiInstance: true,
-  },
+const modules = import.meta.glob<{ default: AppManifest }>('./*/manifest.ts', { eager: true })
+
+export const APP_REGISTRY: Record<AppId, AppManifest> = {}
+for (const [file, mod] of Object.entries(modules)) {
+  const m = mod.default
+  if (!m?.id) {
+    console.warn(`[registry] ${file} has no default AppManifest export`)
+    continue
+  }
+  if (APP_REGISTRY[m.id]) console.warn(`[registry] duplicate app id "${m.id}" in ${file}`)
+  APP_REGISTRY[m.id] = m
 }
 
-export const START_MENU_APPS: AppId[] = [
-  'files',
-  'notepad',
-  'calculator',
-  'vintageLab',
-  'about',
-]
+export function getApp(id: AppId): AppManifest | undefined {
+  return APP_REGISTRY[id]
+}
 
-export function appGlyph(appId: AppId | string): string {
-  switch (appId) {
-    case 'about':
-      return 'i'
-    case 'notepad':
-      return 'N'
-    case 'calculator':
-      return '#'
-    case 'files':
-      return 'F'
-    case 'vintageLab':
-      return 'V'
-    case 'imageViewer':
-      return 'I'
-    case 'alert':
-      return '!'
-    default:
-      return 'A'
-  }
+export function allApps(): AppManifest[] {
+  return Object.values(APP_REGISTRY)
+}
+
+export const START_MENU_APPS: AppId[] = allApps()
+  .filter((a) => a.startMenu)
+  .sort(
+    (a, b) =>
+      (a.startMenu!.order ?? 100) - (b.startMenu!.order ?? 100) || a.title.localeCompare(b.title),
+  )
+  .map((a) => a.id)
+
+export const DESKTOP_APPS: AppManifest[] = allApps()
+  .filter((a) => a.desktop)
+  .sort((a, b) => (a.desktop!.order ?? 100) - (b.desktop!.order ?? 100))
+
+/** Best icon URL for a pixel size; null → use appGlyph. */
+export function appIcon(appId: AppId, size = 16): string | null {
+  const i = APP_REGISTRY[appId]?.icon
+  if (!i) return null
+  return i.svg ?? (size > 16 ? i.png32 ?? i.png16 : i.png16 ?? i.png32) ?? null
+}
+
+export function appGlyph(appId: AppId): string {
+  const m = APP_REGISTRY[appId]
+  return m?.icon.glyph ?? m?.title.charAt(0).toUpperCase() ?? 'A'
+}
+
+/** Normalize '.TXT' / 'txt' → '.txt' */
+export function normExt(ext: string): string {
+  const e = ext.trim().toLowerCase()
+  return e.startsWith('.') ? e : `.${e}`
 }

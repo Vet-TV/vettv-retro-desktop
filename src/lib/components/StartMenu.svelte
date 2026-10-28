@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { APP_REGISTRY, START_MENU_APPS, appGlyph } from '../apps/registry'
-  import { appIcon, V2K_START_WORDMARK } from '../apps/icons'
+  import { APP_REGISTRY, START_MENU_APPS, appGlyph, appIcon } from '../apps/registry'
+  import { V2K_START_WORDMARK } from '../apps/icons'
   import type { AppId } from '../types'
   import { windowManager } from '../stores/windowManager'
 
@@ -42,8 +42,8 @@
             onclick={() => launch(appId)}
           >
             <span class="glyph" aria-hidden="true">
-              {#if appIcon(appId)}
-                <img src={appIcon(appId)} alt="" width="24" height="24" draggable="false" />
+              {#if appIcon(appId, 24)}
+                <img src={appIcon(appId, 24)} alt="" width="24" height="24" draggable="false" />
               {:else}
                 {appGlyph(appId)}
               {/if}

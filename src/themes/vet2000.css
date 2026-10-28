@@ -41,7 +41,90 @@
   --v2k-border: 2px;
   --v2k-window-shadow: none;
 
+  /* --- Neutral app/shell tokens (--rd-*) — apps use ONLY these; each skin maps them --- */
+  --rd-face: var(--v2k-face);
+  --rd-face-light: var(--v2k-face-light);
+  --rd-face-shadow: var(--v2k-face-dark);
+  --rd-face-dark-shadow: var(--v2k-face-darker);
+  --rd-text: #000000;
+  --rd-text-disabled: #808080;
+  --rd-highlight: var(--v2k-menu-highlight);
+  --rd-highlight-text: var(--v2k-menu-highlight-text);
+  --rd-font: var(--v2k-font);
+  --rd-font-size: var(--v2k-font-size);
+  --rd-border-raised: var(--v2k-face-light) var(--rd-face-dark-shadow) var(--rd-face-dark-shadow)
+    var(--v2k-face-light);
+  --rd-border-raised-thin: var(--v2k-face-light) var(--rd-face-shadow) var(--rd-face-shadow)
+    var(--v2k-face-light);
+  --rd-border-sunken: var(--rd-face-dark-shadow) var(--v2k-face-light) var(--v2k-face-light)
+    var(--rd-face-dark-shadow);
+  --rd-border-sunken-thin: var(--rd-face-shadow) var(--v2k-face-light) var(--v2k-face-light)
+    var(--rd-face-shadow);
+  --rd-input-bg: #ffffff;
+  --rd-window-bg: #ffffff;
+  --rd-title-active-start: var(--v2k-title-active-start);
+  --rd-title-active-end: var(--v2k-title-active-end);
+  --rd-title-inactive-start: var(--v2k-title-inactive-start);
+  --rd-title-inactive-end: var(--v2k-title-inactive-end);
+  --rd-title-text: var(--v2k-title-text);
+  --rd-title-text-inactive: var(--v2k-title-text-inactive);
+  --rd-window-shadow: var(--v2k-window-shadow);
+
   color-scheme: light;
+}
+
+/* --- Shared app classes (skin-neutral) --- */
+.rd-button {
+  font-family: var(--rd-font);
+  font-size: var(--rd-font-size);
+  background: var(--rd-face);
+  color: var(--rd-text);
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--rd-border-raised);
+  padding: 2px 10px;
+  min-width: 72px;
+  cursor: default;
+  outline: none;
+  box-sizing: border-box;
+}
+.rd-button:active,
+.rd-button.pressed {
+  border-color: var(--rd-border-sunken);
+  padding: 3px 9px 1px 11px;
+}
+.rd-button:focus-visible {
+  outline: 1px dotted var(--rd-text);
+  outline-offset: -4px;
+}
+.rd-button:disabled {
+  color: var(--rd-text-disabled);
+}
+.rd-field {
+  font-family: var(--rd-font);
+  font-size: var(--rd-font-size);
+  padding: 2px 4px;
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--rd-border-sunken);
+  background: var(--rd-input-bg);
+  color: var(--rd-text);
+  outline: none;
+  box-sizing: border-box;
+}
+.rd-field:focus {
+  outline: 1px dotted var(--rd-text);
+  outline-offset: -3px;
+}
+.rd-panel {
+  background: var(--rd-face);
+  color: var(--rd-text);
+  font-family: var(--rd-font);
+  font-size: var(--rd-font-size);
+  border-style: solid;
+  border-width: 2px;
+  border-color: var(--rd-border-raised);
+  box-sizing: border-box;
 }
 
 /* --- Bevel helpers (classic raised / sunken) --- */
@@ -223,19 +306,17 @@
   flex-direction: column;
   min-width: 180px;
   min-height: 100px;
-  background: var(--v2k-face);
+  background: var(--rd-face);
   border-style: solid;
   border-width: 2px;
-  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
-    var(--v2k-face-light);
+  border-color: var(--rd-border-raised);
   box-sizing: border-box;
-  box-shadow: var(--v2k-window-shadow);
+  box-shadow: var(--rd-window-shadow);
 }
 
 .v2k-window.maximized {
   border-width: 1px;
-  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
-    var(--v2k-face-light);
+  border-color: var(--rd-border-raised);
   border-radius: 0;
 }
 
@@ -251,10 +332,10 @@
   gap: 4px;
   background: linear-gradient(
     90deg,
-    var(--v2k-title-inactive-start),
-    var(--v2k-title-inactive-end)
+    var(--rd-title-inactive-start),
+    var(--rd-title-inactive-end)
   );
-  color: var(--v2k-title-text-inactive);
+  color: var(--rd-title-text-inactive);
   cursor: default;
   flex-shrink: 0;
 }
@@ -262,10 +343,10 @@
 .v2k-window.active .v2k-titlebar {
   background: linear-gradient(
     90deg,
-    var(--v2k-title-active-start),
-    var(--v2k-title-active-end)
+    var(--rd-title-active-start),
+    var(--rd-title-active-end)
   );
-  color: var(--v2k-title-text);
+  color: var(--rd-title-text);
 }
 
 .v2k-titlebar-icon {
@@ -279,7 +360,7 @@
   justify-content: center;
   font-size: 9px;
   font-weight: bold;
-  color: var(--v2k-title-active-start);
+  color: var(--rd-title-active-start);
   overflow: hidden;
 }
 
@@ -313,22 +394,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--v2k-font);
+  font-family: var(--rd-font);
   font-size: 10px;
   font-weight: bold;
   line-height: 1;
-  background: var(--v2k-face);
-  color: #000;
+  background: var(--rd-face);
+  color: var(--rd-text);
   border-style: solid;
   border-width: 1px;
-  border-color: var(--v2k-face-light) var(--v2k-face-darker) var(--v2k-face-darker)
-    var(--v2k-face-light);
+  border-color: var(--rd-border-raised);
   cursor: default;
 }
 
 .v2k-title-btn:active {
-  border-color: var(--v2k-face-darker) var(--v2k-face-light) var(--v2k-face-light)
-    var(--v2k-face-darker);
+  border-color: var(--rd-border-sunken);
 }
 
 .v2k-title-btn.close:hover {
@@ -345,15 +424,14 @@
   flex: 1;
   margin: 2px;
   padding: 8px;
-  background: #fff;
+  background: var(--rd-window-bg);
   border-style: solid;
   border-width: 1px;
-  border-color: var(--v2k-face-dark) var(--v2k-face-light) var(--v2k-face-light)
-    var(--v2k-face-dark);
+  border-color: var(--rd-border-sunken-thin);
   overflow: auto;
-  color: #000;
-  font-family: var(--v2k-font);
-  font-size: var(--v2k-font-size);
+  color: var(--rd-text);
+  font-family: var(--rd-font);
+  font-size: var(--rd-font-size);
   cursor: auto;
   user-select: text;
 }

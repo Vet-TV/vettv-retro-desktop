@@ -3,8 +3,9 @@
   import { windowManager } from '../stores/windowManager'
   import type { WindowState } from '../types'
   import { initVfs, openVfsPath, uploadBrowserFiles } from '../vfs'
-  import { appIcon, V2K_WALLPAPER } from '../apps/icons'
-  import { appGlyph } from '../apps/registry'
+  import { V2K_WALLPAPER } from '../apps/icons'
+  import { appGlyph, appIcon, DESKTOP_APPS } from '../apps/registry'
+  import ShellDialogs from './ShellDialogs.svelte'
   import Window from './Window.svelte'
   import Taskbar from './Taskbar.svelte'
 
@@ -29,26 +30,6 @@
       vfsReady = true
     })
   })
-
-  function openFiles() {
-    windowManager.openApp('files')
-  }
-
-  function openNotepad() {
-    windowManager.openApp('notepad')
-  }
-
-  function openCalculator() {
-    windowManager.openApp('calculator')
-  }
-
-  function openAbout() {
-    windowManager.openApp('about')
-  }
-
-  function openVintageLab() {
-    windowManager.openApp('vintageLab')
-  }
 
   function isFileDrag(e: DragEvent): boolean {
     return Array.from(e.dataTransfer?.types ?? []).includes('Files')
@@ -103,28 +84,12 @@
     }
   }
 
-  const desktopApps = [
-    { id: 'files' as const, label: 'Files', title: 'Files', open: openFiles },
-    {
-      id: 'vintageLab' as const,
-      label: 'Vintage Lab',
-      title: 'Boot your own retro OS image',
-      open: openVintageLab,
-    },
-    { id: 'notepad' as const, label: 'Notepad', title: 'Notepad', open: openNotepad },
-    {
-      id: 'calculator' as const,
-      label: 'Calculator',
-      title: 'Calculator',
-      open: openCalculator,
-    },
-    {
-      id: 'about' as const,
-      label: 'About VetTV',
-      title: 'About VetTV Retro Desktop',
-      open: openAbout,
-    },
-  ]
+  const desktopApps = DESKTOP_APPS.map((m) => ({
+    id: m.id,
+    label: m.desktop!.label,
+    title: m.title,
+    open: () => windowManager.openApp(m.id),
+  }))
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -149,8 +114,8 @@
         title={app.title}
       >
         <span class="glyph" aria-hidden="true">
-          {#if appIcon(app.id)}
-            <img src={appIcon(app.id)} alt="" width="32" height="32" draggable="false" />
+          {#if appIcon(app.id, 32)}
+            <img src={appIcon(app.id, 32)} alt="" width="32" height="32" draggable="false" />
           {:else}
             {appGlyph(app.id)}
           {/if}
@@ -179,4 +144,6 @@
   {/each}
 
   <Taskbar {windows} {focusedId} />
+
+  <ShellDialogs />
 </div>
