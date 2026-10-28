@@ -1,10 +1,8 @@
 <script lang="ts">
-  // Thin shell adapter; real app lives in ../text-editor/ for manifest migration.
-  import { windowManager } from '../../stores/windowManager'
+  // Thin adapter; app lives in ../text-editor/.
+  import type { AppHost } from '../../types'
   import VetPad from '../text-editor/VetPad.svelte'
-  let { windowId, path }: { windowId: string; path?: string } = $props()
+  let { host, path }: { host: AppHost; path?: string } = $props()
 </script>
 
-<VetPad {path}
-  setTitle={(t) => windowManager.setTitle(windowId, t)}
-  setPath={(p) => windowManager.setPayload(windowId, p ? { path: p } : {})} />
+<VetPad {host} {path} />

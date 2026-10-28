@@ -1,19 +1,10 @@
 <script lang="ts">
-  import { onDestroy, onMount } from 'svelte'
-  import { listDir } from '../../vfs'
-  import {
-    APP_NAME, DEFAULT_DIR, FONT_SIZES, docExists, lineCol, loadDoc, saveDoc,
-    timeDate, titleFor, toPath,
-  } from './editor'
+  import { onDestroy, onMount, untrack } from 'svelte'
+  import type { AppHost } from '../../types'
+  import { APP_NAME, DEFAULT_DIR, FILE_TYPES, FONT_SIZES, lineCol, timeDate, titleFor } from './editor'
   import { ABOUT_LINES, randomQuip } from './gags'
 
-  interface Props {
-    path?: string
-    /** Host hooks; will map to the manifest host context later. */
-    setTitle?: (t: string) => void
-    setPath?: (p: string | undefined) => void
-  }
-  let { path, setTitle, setPath }: Props = $props()
+  let { host, path }: { host: AppHost; path?: string } = $props()
 
   let ta: HTMLTextAreaElement
   let text = $state('')
@@ -23,9 +14,7 @@
   let fontSize = $state(14)
   let caret = $state(0)
   let menu = $state<string | null>(null)
-  let dialog = $state<null | 'open' | 'saveAs' | 'about'>(null)
-  let nameInput = $state('Untitled.txt')
-  let files = $state<string[]>([])
+  let about = $state(false)
   let toast = $state('')
   let hovered = false
   let history: string[] = []
@@ -33,7 +22,15 @@
   let toastTimer: ReturnType<typeof setTimeout> | undefined
 
   const pos = $derived(lineCol(text, caret))
-  $effect(() => setTitle?.(titleFor(current, dirty)))
+  $effect(() => host.setTitle(titleFor(current, dirty)))
+  $effect(() =>
+    host.onBeforeClose(() => !dirty || host.confirm('You have unsaved changes. Close anyway and let them drift into the static?', APP_NAME)),
+  )
+  // path is reactive (Files / Open with / setFilePath)
+  $effect(() => {
+    const p = path
+    if (p) untrack(() => { if (p !== current) void open(p) })
+  })
 
   function say(msg: string) {
     toast = msg
@@ -42,10 +39,18 @@
   }
 
   async function open(p: string) {
+    if (p !== current && dirty && !(await host.confirm('Discard unsaved changes?', APP_NAME))) return
     try {
-      text = await loadDoc(p); current = p; dirty = false; history = []
-      setPath?.(p); dialog = null
+      text = await host.vfs.readText(p); current = p; dirty = false; history = []
+      host.setFilePath(p)
     } catch (e) { say(e instanceof Error ? e.message : 'Could not open') }
+  }
+
+  async function writeTo(p: string) {
+    try {
+      await host.vfs.writeFile(p, text, 'text/plain')
+      current = p; dirty = false; host.setFilePath(p); say(`Saved ${p}`)
+    } catch (e) { say(e instanceof Error ? e.message : 'Save failed') }
   }
 
   function track() { caret = ta?.selectionStart ?? 0 }
@@ -62,20 +67,18 @@
   }
 
   const actions: Record<string, () => void | Promise<void>> = {
-    new: () => {
-      if (dirty && !confirm('Discard unsaved changes?')) return
-      text = ''; current = undefined; dirty = false; history = []; setPath?.(undefined)
+    new: async () => {
+      if (dirty && !(await host.confirm('Discard unsaved changes?', APP_NAME))) return
+      text = ''; current = undefined; dirty = false; history = []; host.setFilePath(null)
     },
     open: async () => {
-      files = (await listDir(DEFAULT_DIR)).filter((m) => m.kind === 'file').map((m) => m.path)
-      dialog = 'open'
+      const p = await host.pickFile({ mode: 'open', extensions: FILE_TYPES, defaultPath: current ?? DEFAULT_DIR, title: 'Open — VetPad' })
+      if (p) await open(p)
     },
-    save: async () => {
-      if (!current) return actions.saveAs()
-      await saveDoc(current, text); dirty = false; say(`Saved ${current}`)
-    },
-    saveAs: () => {
-      nameInput = current?.split('/').pop() ?? 'Untitled.txt'; dialog = 'saveAs'
+    save: async () => (current ? writeTo(current) : actions.saveAs()),
+    saveAs: async () => {
+      const p = await host.pickFile({ mode: 'save', extensions: FILE_TYPES, defaultPath: current ?? `${DEFAULT_DIR}/Untitled.txt`, title: 'Save As — VetPad' })
+      if (p) await writeTo(p)
     },
     undo: () => { if (history.length) { text = history.pop()!; dirty = true } },
     cut: async () => { await navigator.clipboard?.writeText(sel()); insert('') },
@@ -84,23 +87,14 @@
     selectAll: () => { ta.focus(); ta.select() },
     timeDate: () => insert(timeDate()),
     wrap: () => { wrap = !wrap },
-    about: () => { dialog = 'about' },
+    about: () => { about = true },
   }
   const sel = () => text.slice(ta.selectionStart, ta.selectionEnd)
 
   function run(k: string) { menu = null; void actions[k]() }
 
-  async function confirmSaveAs() {
-    const dest = toPath(nameInput)
-    if (dest !== current && (await docExists(dest)) && !confirm('File exists. Overwrite?')) return
-    try {
-      await saveDoc(dest, text); current = dest; dirty = false; dialog = null
-      setPath?.(dest); say(`Saved ${dest}`)
-    } catch (e) { say(e instanceof Error ? e.message : 'Save failed') }
-  }
-
   function onKey(e: KeyboardEvent) {
-    if (e.key === 'Escape') { menu = null; if (dialog) dialog = null; return }
+    if (e.key === 'Escape') { menu = null; about = false; return }
     if (!(e.ctrlKey || e.metaKey)) { if (e.key === 'F5') { e.preventDefault(); run('timeDate') } return }
     const map: Record<string, string> = { n: 'new', o: 'open', s: e.shiftKey ? 'saveAs' : 'save', z: 'undo' }
     const k = map[e.key.toLowerCase()]
@@ -108,7 +102,6 @@
   }
 
   onMount(() => {
-    if (path) void open(path)
     quipTimer = setInterval(() => { if (dirty) say(randomQuip()) }, 90_000)
   })
   onDestroy(() => { clearInterval(quipTimer); clearTimeout(toastTimer) })
@@ -162,34 +155,18 @@
     <span class="cell">{fontSize} pt</span>
   </div>
 
-  {#if dialog}
+  {#if about}
     <div class="vp-scrim">
-      <div class="vp-dialog rd-panel" role="dialog" aria-modal="true">
-        {#if dialog === 'about'}
-          <div class="about">
-            <svg width="40" height="40" viewBox="0 0 32 32" aria-hidden="true">
-              <rect x="5" y="3" width="22" height="26" fill="var(--rd-input-bg, #fff)" stroke="var(--rd-text, #000)"/>
-              <path d="M9 9h14M9 13h14M9 17h10" stroke="var(--rd-highlight, #1a4fa0)" stroke-width="2"/>
-              <text x="16" y="27" font-size="8" text-anchor="middle" fill="var(--rd-text, #000)" font-family="monospace">VTV</text>
-            </svg>
-            <div>{#each ABOUT_LINES as l, i}<p class:b={i === 0}>{l}</p>{/each}</div>
-          </div>
-          <div class="row"><button class="rd-button" onclick={() => (dialog = null)}>Groan, OK</button></div>
-        {:else if dialog === 'open'}
-          <p class="b">Open from {DEFAULT_DIR}</p>
-          <div class="list rd-field">
-            {#each files as f}<button onclick={() => open(f)}>{f.split('/').pop()}</button>{:else}<em>Nothing here but dust.</em>{/each}
-          </div>
-          <div class="row"><button class="rd-button" onclick={() => (dialog = null)}>Cancel</button></div>
-        {:else}
-          <label class="b">Save to {DEFAULT_DIR} as:
-            <input class="rd-field" bind:value={nameInput}
-              onkeydown={(e) => e.key === 'Enter' && confirmSaveAs()} /></label>
-          <div class="row">
-            <button class="rd-button" onclick={confirmSaveAs}>Save</button>
-            <button class="rd-button" onclick={() => (dialog = null)}>Cancel</button>
-          </div>
-        {/if}
+      <div class="vp-dialog rd-panel" role="dialog" aria-modal="true" aria-label="About {APP_NAME}">
+        <div class="about">
+          <svg width="40" height="40" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="5" y="3" width="22" height="26" fill="var(--rd-input-bg, #fff)" stroke="var(--rd-text, #000)"/>
+            <path d="M9 9h14M9 13h14M9 17h10" stroke="var(--rd-highlight, #1a4fa0)" stroke-width="2"/>
+            <text x="16" y="27" font-size="8" text-anchor="middle" fill="var(--rd-text, #000)" font-family="monospace">VTV</text>
+          </svg>
+          <div>{#each ABOUT_LINES as l, i}<p class:b={i === 0}>{l}</p>{/each}</div>
+        </div>
+        <div class="row"><button class="rd-button" onclick={() => (about = false)}>Groan, OK</button></div>
       </div>
     </div>
   {/if}
@@ -203,9 +180,7 @@
     --txt: var(--rd-text, #000);
     --hi: var(--rd-highlight, #1a4fa0);
     --hitxt: var(--rd-highlight-text, #fff);
-    --raised: var(--rd-border-raised, 1px solid var(--shadow));
-    --sunken: var(--rd-border-sunken, 1px solid var(--shadow));
-    position: relative; display: flex; flex-direction: column; height: 100%; min-height: 0;
+        position: relative; display: flex; flex-direction: column; height: 100%; min-height: 0;
     background: var(--face); color: var(--txt);
     font-family: var(--rd-font, Tahoma, Verdana, sans-serif);
     font-size: var(--rd-font-size, 12px);
@@ -216,28 +191,24 @@
   .vp-top { padding: 2px 8px; }
   .vp-top:hover, .vp-top.open { background: var(--hi); color: var(--hitxt); }
   .vp-drop { position: absolute; top: 100%; left: 0; z-index: 10; min-width: 170px; padding: 2px;
-    background: var(--face); border: var(--raised); box-shadow: 2px 2px 0 var(--shadow); }
+    background: var(--face); border: 2px solid; border-color: var(--rd-border-raised, var(--light) var(--shadow) var(--shadow) var(--light)); box-shadow: 2px 2px 0 var(--shadow); }
   .vp-drop button { display: flex; justify-content: space-between; gap: 16px; width: 100%; padding: 3px 10px; text-align: left; }
   .vp-drop button:hover { background: var(--hi); color: var(--hitxt); }
   .hint { opacity: .7; }
   .sep { border-top: 1px solid var(--shadow); border-bottom: 1px solid var(--light); margin: 3px 2px; }
   .vp-text { flex: 1; min-height: 0; resize: none; margin: 0; padding: 4px 6px; outline: none;
-    background: var(--rd-input-bg, #fff); color: var(--txt); border: var(--sunken);
+    background: var(--rd-input-bg, #fff); color: var(--txt); border: 2px solid; border-color: var(--rd-border-sunken, var(--shadow) var(--light) var(--light) var(--shadow));
     font-family: 'Lucida Console', 'Courier New', monospace; white-space: pre-wrap; }
   .vp-text.nowrap { white-space: pre; overflow-x: auto; }
   .vp-status { display: flex; background: var(--face); border-top: 1px solid var(--light); padding: 2px; gap: 2px; }
-  .vp-status span { padding: 1px 6px; border: var(--sunken); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .vp-status span { padding: 1px 6px; border: 2px solid; border-color: var(--rd-border-sunken, var(--shadow) var(--light) var(--light) var(--shadow)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .grow { flex: 1; }
   .cell { min-width: 64px; }
   .vp-scrim { position: absolute; inset: 0; display: grid; place-items: center; background: rgb(0 0 0 / .15); z-index: 20; }
-  .vp-dialog { width: min(340px, 90%); padding: 12px; background: var(--face); border: var(--raised); box-shadow: 3px 3px 0 var(--shadow); }
+  .vp-dialog { width: min(340px, 90%); padding: 12px; background: var(--face); border: 2px solid; border-color: var(--rd-border-raised, var(--light) var(--shadow) var(--shadow) var(--light)); box-shadow: 3px 3px 0 var(--shadow); }
   .about { display: flex; gap: 12px; }
   .about p { margin: 0 0 6px; }
   .b { font-weight: bold; }
   .row { display: flex; justify-content: flex-end; gap: 6px; margin-top: 10px; }
-  .row .rd-button { min-width: 72px; padding: 3px 10px; background: var(--face); border: var(--raised); }
-  .list { display: flex; flex-direction: column; max-height: 150px; overflow: auto; margin-top: 6px; background: var(--rd-input-bg, #fff); border: var(--sunken); padding: 2px; }
-  .list button { text-align: left; padding: 2px 4px; }
-  .list button:hover { background: var(--hi); color: var(--hitxt); }
-  label input { display: block; width: 100%; box-sizing: border-box; margin-top: 6px; padding: 3px; background: var(--rd-input-bg, #fff); border: var(--sunken); font: inherit; color: var(--txt); }
+  .row .rd-button { min-width: 72px; padding: 3px 10px; background: var(--face); border: 2px solid; border-color: var(--rd-border-raised, var(--light) var(--shadow) var(--shadow) var(--light)); }
 </style>
