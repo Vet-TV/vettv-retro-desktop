@@ -27,6 +27,7 @@
   let nameInput = $state('Untitled.txt')
   let files = $state<string[]>([])
   let toast = $state('')
+  let hovered = false
   let history: string[] = []
   let quipTimer: ReturnType<typeof setInterval> | undefined
   let toastTimer: ReturnType<typeof setTimeout> | undefined
@@ -99,6 +100,7 @@
   }
 
   function onKey(e: KeyboardEvent) {
+    if (e.key === 'Escape') { menu = null; if (dialog) dialog = null; return }
     if (!(e.ctrlKey || e.metaKey)) { if (e.key === 'F5') { e.preventDefault(); run('timeDate') } return }
     const map: Record<string, string> = { n: 'new', o: 'open', s: e.shiftKey ? 'saveAs' : 'save', z: 'undo' }
     const k = map[e.key.toLowerCase()]
@@ -125,8 +127,8 @@
     {#each Object.entries(MENUS) as [label, items]}
       <div class="vp-menu">
         <button class="vp-top" class:open={menu === label} role="menuitem"
-          onclick={() => (menu = menu === label ? null : label)}
-          onmouseenter={() => menu && (menu = label)}>{label}</button>
+          onclick={() => { menu = menu === label && !hovered ? null : label; hovered = false }}
+          onmouseenter={() => { if (menu && menu !== label) { menu = label; hovered = true } }}>{label}</button>
         {#if menu === label}
           <div class="vp-drop rd-panel" role="menu">
             {#each items as [name, key, hint]}
